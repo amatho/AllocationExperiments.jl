@@ -2,3 +2,8 @@ name = "AllocationExperiments"
 uuid = "3e7669f8-7d4f-4659-8d9d-fc85331956d1"
 authors = ["Amandus Søve Thorsrud <ama.thorsrud@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+AllocationInstances = "555b26a8-2a75-48c7-85b7-65ed21549184"
+Allocations = "260a3f16-0ffa-4f23-875b-1350d3996fb5"
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
