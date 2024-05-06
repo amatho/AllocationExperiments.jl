@@ -108,7 +108,7 @@ function bench_mnw_matroid(gen_matroid::Function, set_constraints::Function; rng
             push!(ef1_checks, check_ef1(V, A))
             push!(efx_checks, check_efx(V, A))
 
-            mmss = alloc_mms(V).mmss
+            mmss = [mms(V, i, solver=solver).mms for i in agents(V)]
             push!(mms_alphas, mms_alpha(V, A, mmss))
 
             count += 1
@@ -154,7 +154,7 @@ function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         push!(ef1_checks, check_ef1(V, A))
         push!(efx_checks, check_efx(V, A))
 
-        mmss = alloc_mms(V).mmss
+        mmss = [mms(V, i, solver=solver).mms for i in agents(V)]
         push!(mms_alphas, mms_alpha(V, A, mmss))
 
         count += 1
