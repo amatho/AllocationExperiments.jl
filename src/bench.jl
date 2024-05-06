@@ -20,7 +20,7 @@ end
 function bench_mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(m)
-        min_verts = ceil(Int, sqrt(2*m) + (1/2))
+        min_verts = ceil(Int, sqrt(2 * m) + (1 / 2))
         n = rand(rng, min_verts:3*m)
         g = erdos_renyi(n, m, seed=rand(rng, UInt))
         GraphicMatroid(g)
@@ -88,25 +88,40 @@ function bench_mnw_matroid(gen_matroid::Function, set_constraints::Function; rng
         return ctx
     end
 
+    count = 1
     ranks = Int[]
+    ef1_checks = Bool[]
+    efx_checks = Bool[]
+    mms_alphas = Float64[]
     function collect(ctx, M)
         term_status = termination_status(ctx.model)
 
         if term_status in Allocations.conf.MIP_SUCCESS
             result = Allocations.mnw_result(ctx)
-            @info "MNW Result" alloc = result.alloc status = term_status
+            count % 10 == 0 && @info "Finished sample number $count"
 
-            for B in result.alloc.bundle
-                @assert is_indep(M, B)
-            end
+            V, A = ctx.profile, result.alloc
+
+            @assert check(V, A, MatroidConstraint(M)) "Allocation does not satisfy matroid constraint"
 
             push!(ranks, rank(M))
+            push!(ef1_checks, check_ef1(V, A))
+            push!(efx_checks, check_efx(V, A))
+
+            mmss = alloc_mms(V).mmss
+            push!(mms_alphas, mms_alpha(V, A, mmss))
+
+            count += 1
         end
     end
 
     b = @benchmark ctx = $run(V, M) setup = ((V, M) = $gen(); ctx = nothing) teardown = ($collect(ctx, M)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
 
-    @info "Average rank" avg = StatsPlots.mean(ranks)
+    mean_rank = mean(ranks)
+    mean_ef1 = mean(ef1_checks)
+    mean_efx = mean(efx_checks)
+    mean_mms_alpha = mean(mms_alphas)
+    @info "Statistics over $samples samples" mean_rank mean_ef1 mean_efx mean_mms_alpha
 
     b
 end
@@ -126,10 +141,31 @@ function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         Allocations.solve_mip
     end
 
+    count = 1
+    ef1_checks = Bool[]
+    efx_checks = Bool[]
+    mms_alphas = Float64[]
     function collect(ctx)
         result = Allocations.mnw_result(ctx)
-        @info alloc = result.alloc
+        count % 10 == 0 && @info "Finished sample number $count"
+
+        V, A = ctx.profile, result.alloc
+
+        push!(ef1_checks, check_ef1(V, A))
+        push!(efx_checks, check_efx(V, A))
+
+        mmss = alloc_mms(V).mmss
+        push!(mms_alphas, mms_alpha(V, A, mmss))
+
+        count += 1
     end
 
-    @benchmark ctx = $run(V) setup = (V = $gen(); ctx = nothing) teardown = ($collect(ctx)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
+    b = @benchmark ctx = $run(V) setup = (V = $gen(); ctx = nothing) teardown = ($collect(ctx)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
+
+    mean_ef1 = mean(ef1_checks)
+    mean_efx = mean(efx_checks)
+    mean_mms_alpha = mean(mms_alphas)
+    @info "Statistics over $samples samples" mean_ef1 mean_efx mean_mms_alpha
+
+    b
 end

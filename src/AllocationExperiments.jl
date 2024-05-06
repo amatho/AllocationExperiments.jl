@@ -10,7 +10,7 @@ using Gurobi
 using JuMP
 using Logging
 using Random: default_rng, Xoshiro
-using StatsPlots
+using StatsPlots: mean
 
 include("tools.jl")
 include("consts.jl")
