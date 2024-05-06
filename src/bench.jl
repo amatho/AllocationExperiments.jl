@@ -1,9 +1,10 @@
 create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]), "LogToConsole" => 0, "TimeLimit" => TIME_LIMIT)
 
 
-function bench_mnw_matroid_lazy_knu74(; rng=default_rng(), samples=SAMPLES)
+function bench_mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+    rng = gen_rng()
     function gen_matroid(m)
-        AllocationInstances.rand_matroid_knu74_1(m, [0, 15, 6], rng=rng)
+        AllocationInstances.rand_matroid_knu74_1(m, [0, 6, 2], rng=rng)
     end
 
     function set_constraints(M)
@@ -12,11 +13,26 @@ function bench_mnw_matroid_lazy_knu74(; rng=default_rng(), samples=SAMPLES)
         end
     end
 
-    bench_mnw_matroid(gen_matroid, set_constraints, rng=rng, samples=samples)
+    bench_mnw_matroid(gen_matroid, set_constraints, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mnw_matroid_lazy_ws98()
+function bench_mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+    rng = gen_rng()
+    function gen_matroid(m)
+        min_verts = ceil(Int, sqrt(2*m) + (1/2))
+        n = rand(rng, min_verts:3*m)
+        g = erdos_renyi(n, m, seed=rand(rng, UInt))
+        GraphicMatroid(g)
+    end
+
+    function set_constraints(M)
+        return function (ctx)
+            ctx |> Allocations.enforce_lazy(MatroidConstraint(M))
+        end
+    end
+
+    bench_mnw_matroid(gen_matroid, set_constraints, rng=gen_rng(), samples=samples)
 end
 
 
@@ -72,39 +88,47 @@ function bench_mnw_matroid(gen_matroid::Function, set_constraints::Function; rng
         return ctx
     end
 
+    ranks = Int[]
     function collect(ctx, M)
         term_status = termination_status(ctx.model)
 
         if term_status in Allocations.conf.MIP_SUCCESS
             result = Allocations.mnw_result(ctx)
-            @info result status = term_status
+            @info "MNW Result" alloc = result.alloc status = term_status
 
             for B in result.alloc.bundle
                 @assert is_indep(M, B)
             end
+
+            push!(ranks, rank(M))
         end
     end
 
-    @benchmark ctx = $run(V, M) setup = ((V, M) = $gen(); ctx = nothing) teardown = ($collect(ctx, M)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
+    b = @benchmark ctx = $run(V, M) setup = ((V, M) = $gen(); ctx = nothing) teardown = ($collect(ctx, M)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
+
+    @info "Average rank" avg = StatsPlots.mean(ranks)
+
+    b
 end
 
 
-function bench_mnw_unconstrained(; rng=default_rng(), samples=SAMPLES)
+function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     solver = create_gurobi()
 
+    rng = gen_rng()
     function gen()
         AllocationInstances.rand_additive(n=2:6, v=VALUATION_DISTRIBUTION, rng=rng)
     end
 
     function run(V)
-        Allocations.init_mip(V, solver) |>
+        Allocations.init_mip(V, solver, min_owners=0) |>
         Allocations.achieve_mnw(false) |>
         Allocations.solve_mip
     end
 
     function collect(ctx)
         result = Allocations.mnw_result(ctx)
-        @info result
+        @info alloc = result.alloc
     end
 
     @benchmark ctx = $run(V) setup = (V = $gen(); ctx = nothing) teardown = ($collect(ctx)) samples = samples evals = 1 seconds = TIME_LIMIT * samples

@@ -2,15 +2,18 @@ module AllocationExperiments
 
 using Allocations
 using AllocationInstances
+using BenchmarkPlots
 using BenchmarkTools
 using Distributions: DiscreteUniform
+using Graphs
 using Gurobi
 using JuMP
 using Logging
 using Random: default_rng, Xoshiro
+using StatsPlots
 
-include("consts.jl")
 include("tools.jl")
+include("consts.jl")
 include("bench.jl")
 
 
@@ -27,8 +30,7 @@ end
 
 export
     bench_mnw_matroid_lazy_knu74,
-    bench_mnw_matroid_lazy_ws98,
-    bench_mnw_matroid_bases_knu74,
+    bench_mnw_matroid_lazy_er59,
     bench_mnw_unconstrained,
     rng_with_seed
 
