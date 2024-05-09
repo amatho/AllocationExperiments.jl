@@ -4,7 +4,7 @@ create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]
 function bench_mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(m)
-        AllocationInstances.rand_matroid_knu74_1(m, [0, 6, 2], rng=rng)
+        rand_matroid_knu74_1(m, [0, 15, 6], rng=rng)
     end
 
     function set_constraints(M)
@@ -20,10 +20,7 @@ end
 function bench_mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(m)
-        min_verts = ceil(Int, sqrt(2 * m) + (1 / 2))
-        n = rand(rng, min_verts:3*m)
-        g = erdos_renyi(n, m, seed=rand(rng, UInt))
-        GraphicMatroid(g)
+        rand_matroid_er59(m, rng=rng)
     end
 
     function set_constraints(M)
@@ -39,7 +36,7 @@ end
 # TODO: Investigate if this is possible
 # function bench_mnw_matroid_bases_knu74(; rng=default_rng(), samples=SAMPLES)
 #     function gen_matroid(m)
-#         AllocationInstances.rand_matroid_knu74_1(m, [0, 15, 6], rng=rng)
+#         rand_matroid_knu74_1(m, [0, 15, 6], rng=rng)
 #     end
 
 #     function set_constraints(M::Union{ClosedSetsMatroid,FullMatroid})
@@ -62,7 +59,7 @@ function bench_mnw_matroid(gen_matroid::Function, set_constraints::Function; rng
     solver = create_gurobi()
 
     function gen()
-        V = AllocationInstances.rand_additive(n=2:6, v=VALUATION_DISTRIBUTION, rng=rng)
+        V = rand_additive(n=2:6, v=VALUATION, rng=rng)
         M = gen_matroid(ni(V))
 
         return (V, M)
@@ -88,12 +85,17 @@ function bench_mnw_matroid(gen_matroid::Function, set_constraints::Function; rng
         return ctx
     end
 
-    count = 1
+    count = 0
     ranks = Int[]
     ef1_checks = Bool[]
     efx_checks = Bool[]
     mms_alphas = Float64[]
     function collect(ctx, M)
+        if count == 0
+            count += 1
+            return
+        end
+
         term_status = termination_status(ctx.model)
 
         if term_status in Allocations.conf.MIP_SUCCESS
@@ -132,7 +134,7 @@ function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
 
     rng = gen_rng()
     function gen()
-        AllocationInstances.rand_additive(n=2:6, v=VALUATION_DISTRIBUTION, rng=rng)
+        rand_additive(n=2:6, v=VALUATION, rng=rng)
     end
 
     function run(V)
@@ -141,11 +143,16 @@ function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         Allocations.solve_mip
     end
 
-    count = 1
+    count = 0
     ef1_checks = Bool[]
     efx_checks = Bool[]
     mms_alphas = Float64[]
     function collect(ctx)
+        if count == 0
+            count += 1
+            return
+        end
+
         result = Allocations.mnw_result(ctx)
         count % 10 == 0 && @info "Finished sample number $count"
 

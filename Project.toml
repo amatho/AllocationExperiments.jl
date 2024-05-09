@@ -4,7 +4,6 @@ authors = ["Amandus Søve Thorsrud <ama.thorsrud@gmail.com>"]
 version = "0.1.0"
 
 [deps]
-AllocationInstances = "555b26a8-2a75-48c7-85b7-65ed21549184"
 Allocations = "260a3f16-0ffa-4f23-875b-1350d3996fb5"
 BenchmarkPlots = "ab8c0f59-4072-4e0d-8f91-a91e1495eb26"
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"

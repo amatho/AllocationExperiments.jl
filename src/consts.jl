@@ -1,6 +1,6 @@
 const GRB_ENV_REF = Ref{Gurobi.Env}()
 const TIME_LIMIT = 300
 const SAMPLES = 1000
-const VALUATION_DISTRIBUTION = DiscreteUniform(1, 10)
+const VALUATION = (n, m) -> DiscreteUniform(1, 50)
 const DEFAULT_SEED = 7101575807226829984
 const DEFAULT_GEN_RNG = rng_with_seed(DEFAULT_SEED)

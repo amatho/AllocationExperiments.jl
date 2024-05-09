@@ -1,7 +1,6 @@
 module AllocationExperiments
 
 using Allocations
-using AllocationInstances
 using BenchmarkPlots
 using BenchmarkTools
 using Distributions: DiscreteUniform

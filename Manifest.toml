@@ -2,7 +2,7 @@
 
 julia_version = "1.10.2"
 manifest_format = "2.0"
-project_hash = "000b8b3c8ab4e3517871f784a87e1273210fe853"
+project_hash = "4b5e0b945e094888e00171af11911d6cd7f32c6c"
 
 [[deps.AbstractFFTs]]
 deps = ["LinearAlgebra"]
@@ -31,14 +31,8 @@ git-tree-sha1 = "07591db28451b3e45f4c0088a2d5e986ae5aa92d"
 uuid = "66dad0bd-aa9a-41b7-9441-69ab47430ed8"
 version = "1.1.1"
 
-[[deps.AllocationInstances]]
-deps = ["Allocations", "Distributions", "Graphs", "Random"]
-path = "../AllocationInstances.jl"
-uuid = "555b26a8-2a75-48c7-85b7-65ed21549184"
-version = "0.1.0"
-
 [[deps.Allocations]]
-deps = ["AllocationInstances", "DataStructures", "Graphs", "HiGHS", "JuMP", "Random", "SnoopPrecompile"]
+deps = ["DataStructures", "Distributions", "Graphs", "HiGHS", "JuMP", "Random", "SnoopPrecompile"]
 path = "../AllocationsMatroid.jl"
 uuid = "260a3f16-0ffa-4f23-875b-1350d3996fb5"
 version = "0.1.0"
