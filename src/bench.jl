@@ -111,8 +111,7 @@ function bench_mip(alloc_func::Function, gen_constraint::Union{Nothing,Function}
         end
 
         if !isnothing(res)
-            #count % 10 == 0 && @info "Finished sample number $count"
-            @info "Finished sample number $count" res.alloc C
+            count % 10 == 0 && @info "Finished sample number $count"
 
             A = res.alloc
 
