@@ -29,7 +29,9 @@ end
 
 export
     bench_mnw_matroid_lazy_knu74,
+    bench_mnw_matroid_asym_lazy_knu74,
     bench_mnw_matroid_lazy_er59,
+    bench_mnw_matroid_asym_lazy_er59,
     bench_mnw_unconstrained,
     rng_with_seed
 
