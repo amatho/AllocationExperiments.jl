@@ -117,7 +117,7 @@ function experiment_mip(
         end
 
         if !isnothing(res)
-            count % 10 == 0 && @info "Finished sample number $count"
+            CONF.LOG && count % CONF.LOG_EACH == 0 && @info "Finished sample number $count"
 
             A = res.alloc
 

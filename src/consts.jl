@@ -1,3 +1,10 @@
+mutable struct Conf
+    LOG::Bool
+    LOG_EACH::UInt
+end
+
+
+const CONF = Conf(false, 10)
 const GRB_ENV_REF = Ref{Gurobi.Env}()
 const TIME_LIMIT = 300
 const SAMPLES = 1000
