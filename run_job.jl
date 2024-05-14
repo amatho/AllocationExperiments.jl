@@ -15,7 +15,7 @@ job_number = parse(Int, ARGS[1])
 samples = parse(Int, ARGS[2])
 experiment_func = getfield(AllocationExperiments, Symbol(ARGS[3]))
 
-seeds = JSON.parsefile("seeds.json")
+seeds = JSON.parsefile(string(@__DIR__, "/", "seeds.json"))
 rng = rng_with_seed(seeds[job_number])
 
 data = experiment_func(gen_rng=rng, samples=samples)
