@@ -2,6 +2,7 @@ import Pkg
 Pkg.activate(@__DIR__)
 
 using AllocationExperiments
+import InteractiveUtils
 import JSON
 
 if length(ARGS) != 3
@@ -10,6 +11,8 @@ if length(ARGS) != 3
 
     exit(1)
 end
+
+InteractiveUtils.versioninfo()
 
 job_number = parse(Int, ARGS[1])
 samples = parse(Int, ARGS[2])
