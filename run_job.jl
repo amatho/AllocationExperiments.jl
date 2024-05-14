@@ -1,21 +1,23 @@
 import Pkg
-Pkg.activate(".")
+Pkg.activate(@__DIR__)
 
 using AllocationExperiments
 import JSON
 
-if length(ARGS) != 2
+if length(ARGS) != 3
     println("\nIncorrect number of arguments!\n")
-    println("usage: julia run_job.jl <job_number> <samples>")
+    println("usage: julia run_job.jl <job_number> <samples> <experiment>")
 
     exit(1)
 end
 
 job_number = parse(Int, ARGS[1])
 samples = parse(Int, ARGS[2])
+experiment_func = getfield(AllocationExperiments, Symbol(ARGS[3]))
 
-seeds = JSON.parsefile("data/seeds.json")
+seeds = JSON.parsefile("seeds.json")
 rng = rng_with_seed(seeds[job_number])
 
-b = bench_mnw_matroid_asym_lazy_knu74(gen_rng=rng, samples=samples)
-display(b)
+data = experiment_func(gen_rng=rng, samples=samples)
+mkpath("data")
+save("data/$(experiment_func)_job_$(job_number).json", data)

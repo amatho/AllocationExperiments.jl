@@ -1,79 +1,85 @@
 create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]), "LogToConsole" => 0, "TimeLimit" => TIME_LIMIT)
 
 
-function bench_mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(_, m)
         return MatroidConstraint(rand_matroid_knu74_1(m, [0, 15, 6], rng=rng))
     end
 
-    bench_mip(alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(n, m)
-        return MatroidConstraints([rand_matroid_knu74_1(m, [0, 15, 6], rng=rng) for _ in 1:n])
+        return MatroidConstraints(rand_matroid_knu74_1(n, m, [0, 15, 6], rng=rng))
     end
 
-    bench_mip(alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_asym_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(_, m)
         return MatroidConstraint(rand_matroid_er59(m, rng=rng))
     end
 
-    bench_mip(alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_lazy_er59), alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mnw_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mnw_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(n, m)
-        return MatroidConstraints([rand_matroid_er59(m, rng=rng) for _ in 1:n])
+        return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
     end
 
-    bench_mip(alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_asym_lazy_er59), alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
-    bench_mip(alloc_mnw, rng=rng, samples=samples)
+    return experiment_mip(Symbol(mnw_unconstrained), alloc_mnw, rng=rng, samples=samples)
 end
 
 
-function bench_mms_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mms_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(_, m)
         return MatroidConstraint(rand_matroid_er59(m, rng=rng))
     end
 
-    bench_mip(alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mms_matroid_lazy_er59), alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mms_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mms_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(n, m)
-        return MatroidConstraints([rand_matroid_er59(m, rng=rng) for _ in 1:n])
+        return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
     end
 
-    bench_mip(alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mms_matroid_asym_lazy_er59), alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
-function bench_mms_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function mms_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
-    bench_mip(alloc_mms, rng=rng, samples=samples)
+    return experiment_mip(Symbol(mms_unconstrained), alloc_mms, rng=rng, samples=samples)
 end
 
 
-function bench_mip(alloc_func::Function, gen_constraint::Union{Nothing,Function}=nothing; rng=default_rng(), samples=SAMPLES)
+function experiment_mip(
+    name::Symbol,
+    alloc_func::Function,
+    gen_constraint::Union{Nothing,Function}=nothing;
+    rng=default_rng(),
+    samples=SAMPLES
+)
     solver = create_gurobi()
 
     function gen()
@@ -130,10 +136,5 @@ function bench_mip(alloc_func::Function, gen_constraint::Union{Nothing,Function}
 
     b = @benchmark res = $run(V, C) setup = ((V, C) = $gen(); res = nothing) teardown = ($collect(res, V, C)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
 
-    mean_ef1 = mean(ef1_checks)
-    mean_efx = mean(efx_checks)
-    mean_mms_alpha = mean(mms_alphas)
-    @info "Statistics over $samples samples" mean_ef1 mean_efx mean_mms_alpha
-
-    b
+    return Experiment(name, b, samples, ef1_checks, efx_checks, mms_alphas)
 end

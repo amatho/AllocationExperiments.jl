@@ -6,6 +6,7 @@ using BenchmarkTools
 using Distributions: DiscreteUniform
 using Graphs
 using Gurobi
+import JSON
 using JuMP
 using Logging
 using Random: default_rng, Xoshiro
@@ -13,7 +14,8 @@ using StatsPlots: mean
 
 include("tools.jl")
 include("consts.jl")
-include("bench.jl")
+include("types.jl")
+include("experiments.jl")
 
 
 function __init__()
@@ -28,14 +30,17 @@ end
 
 
 export
-    bench_mnw_matroid_lazy_knu74,
-    bench_mnw_matroid_asym_lazy_knu74,
-    bench_mnw_matroid_lazy_er59,
-    bench_mnw_matroid_asym_lazy_er59,
-    bench_mnw_unconstrained,
-    bench_mms_matroid_lazy_er59,
-    bench_mms_matroid_asym_lazy_er59,
-    bench_mms_unconstrained,
-    rng_with_seed
+    Experiment,
+    mnw_matroid_lazy_knu74,
+    mnw_matroid_asym_lazy_knu74,
+    mnw_matroid_lazy_er59,
+    mnw_matroid_asym_lazy_er59,
+    mnw_unconstrained,
+    mms_matroid_lazy_er59,
+    mms_matroid_asym_lazy_er59,
+    mms_unconstrained,
+    rng_with_seed,
+    save,
+    load
 
 end # module AllocationExperiments
