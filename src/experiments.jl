@@ -4,7 +4,7 @@ create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]
 function mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(_, m)
-        return MatroidConstraint(rand_matroid_knu74_1(m, [0, 15, 6], rng=rng))
+        return MatroidConstraint(rand_matroid_knu74(m, [0, 15, 6], rng=rng))
     end
 
     return experiment_mip(Symbol(mnw_matroid_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
@@ -14,7 +14,7 @@ end
 function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(n, m)
-        return MatroidConstraints(rand_matroid_knu74_1(n, m, [0, 15, 6], rng=rng))
+        return MatroidConstraints(rand_matroid_knu74(n, m, [0, 15, 6], rng=rng))
     end
 
     return experiment_mip(Symbol(mnw_matroid_asym_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
