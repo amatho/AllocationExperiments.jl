@@ -41,6 +41,7 @@ export
     mms_unconstrained,
     rng_with_seed,
     save,
-    load
+    load,
+    mergefiles
 
 end # module AllocationExperiments

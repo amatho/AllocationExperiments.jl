@@ -50,3 +50,36 @@ function load(filename::AbstractString, ::Type{Experiment})
     return Experiment(name, benchmark, samples, ef1_checks, efx_checks, mms_alphas)
 end
 load(filename::AbstractString) = load(filename, Experiment)
+
+function Base.merge(data::Experiment, others...)
+    name = data.name
+    benchmark = copy(data.benchmark)
+    samples = data.samples
+    ef1_checks = data.ef1_checks
+    efx_checks = data.efx_checks
+    mms_alphas = data.mms_alphas
+
+    for (i, d) in enumerate(others)
+        push!(benchmark, d.benchmark)
+        samples += d.samples
+        append!(ef1_checks, d.ef1_checks)
+        append!(efx_checks, d.efx_checks)
+        append!(mms_alphas, d.mms_alphas)
+    end
+
+    return Experiment(name, benchmark, samples, ef1_checks, efx_checks, mms_alphas)
+end
+
+function Base.push!(t::BenchmarkTools.Trial, other::BenchmarkTools.Trial)
+    append!(t.times, other.times)
+    append!(t.gctimes, other.gctimes)
+    other.memory < t.memory && (t.memory = memory)
+    other.allocs < t.allocs && (t.allocs = allocs)
+    t.params.samples += other.params.samples
+    return t
+end
+
+function mergefiles(files...)
+    data = [load(f) for f in files]
+    return merge(data...)
+end
