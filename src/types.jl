@@ -21,7 +21,7 @@ function to_json(data::Experiment)
     BenchmarkTools.save(bench_json, data.benchmark)
     dict["benchmark"] = JSON.JSONText(String(take!(bench_json)))
     dict["samples"] = data.samples
-    dict["constraint"] = data.constraint
+    dict["constraint"] = Base.typename(data.constraint).name
     dict["stats"] = data.stats
 
     return JSON.json(dict)
@@ -34,7 +34,7 @@ function from_dict(::Type{Experiment}, dict::Dict{<:AbstractString,Any})
     benchmark = only(BenchmarkTools.load(bench_json))
 
     samples = dict["samples"]
-    constraint = getfield(Allocations, Symbol(dict["constraint"]))
+    constraint = Base.eval(Allocations, Symbol(dict["constraint"]))
     stats = dict["stats"]
 
     return Experiment(benchmark, samples, constraint, stats)

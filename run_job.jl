@@ -23,4 +23,4 @@ rng = rng_with_seed(seeds[job_number])
 
 data = experiment_func(gen_rng=rng, samples=samples)
 mkpath("data")
-save("data/$(experiment_func)_job_$(job_number).json", data)
+save(data, "data/$(experiment_func)_job_$(job_number).json")
