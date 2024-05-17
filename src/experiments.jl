@@ -4,20 +4,20 @@ create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]
 function mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(_, m)
-        return MatroidConstraint(rand_matroid_knu74(m, r=4, rng=rng))
+        return MatroidConstraint(rand_matroid_knu74(m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
 end
 
 
 function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroids(n, m)
-        return MatroidConstraints(rand_matroid_knu74(n, m, r=4, rng=rng))
+        return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_asym_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples)
+    return experiment_mip(Symbol(mnw_matroid_asym_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
 end
 
 
@@ -78,12 +78,14 @@ function experiment_mip(
     alloc_func::Function,
     gen_constraint::Union{Nothing,Function}=nothing;
     rng=default_rng(),
-    samples=SAMPLES
+    samples=SAMPLES,
+    n=2:6,
+    m=n->2n:4n
 )
     solver = create_gurobi()
 
     function gen()
-        V = rand_additive(n=2:6, v=VALUATION, rng=rng)
+        V = rand_additive(n=n, m=m, v=VALUATION, rng=rng)
         C = isnothing(gen_constraint) ? nothing : gen_constraint(na(V), ni(V))
 
         return (V, C)
