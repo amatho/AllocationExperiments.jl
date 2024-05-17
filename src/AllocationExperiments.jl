@@ -17,7 +17,6 @@ include("consts.jl")
 include("types.jl")
 include("experiments.jl")
 
-
 function __init__()
     global GRB_ENV_REF
     GRB_ENV_REF[] = Gurobi.Env()
@@ -27,7 +26,6 @@ function __init__()
 
     return
 end
-
 
 export
     Experiment,
