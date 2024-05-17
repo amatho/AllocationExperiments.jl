@@ -108,13 +108,8 @@ function experiment_mip(
     count = 0
     timeouts = 0
     constraint = nothing
-    stats = Dict{String,Vector{<:Real}}()
-    stats["agents"] = Int[]
-    stats["items"] = Int[]
-    stats["ranks"] = Float64[]
-    stats["ef1_checks"] = Bool[]
-    stats["efx_checks"] = Bool[]
-    stats["mms_alphas"] = Float64[]
+    stats = (agents=Int[], items=Int[], ranks=Float64[], ef1_checks=Bool[],
+        efx_checks=Bool[], mms_alphas=Float64[])
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -129,23 +124,23 @@ function experiment_mip(
 
             A = res.alloc
 
-            push!(stats["agents"], na(A))
-            push!(stats["items"], ni(A))
+            push!(stats.agents, na(A))
+            push!(stats.items, ni(A))
 
             @assert check(V, A, C) "Allocation does not satisfy matroid constraint"
 
             if isa(C, MatroidConstraint)
-                push!(stats["ranks"], rank(C.matroid))
+                push!(stats.ranks, rank(C.matroid))
             elseif isa(C, MatroidConstraints)
-                push!(stats["ranks"], mean(rank(M) for M in C.matroids))
+                push!(stats.ranks, mean(rank(M) for M in C.matroids))
             end
 
-            push!(stats["ef1_checks"], check_ef1(V, A))
-            push!(stats["efx_checks"], check_efx(V, A))
+            push!(stats.ef1_checks, check_ef1(V, A))
+            push!(stats.efx_checks, check_efx(V, A))
 
             # TODO: Use constraint when calculating MMS
             mmss = [mms(V, i, solver=solver, min_owners=0).mms for i in agents(V)]
-            push!(stats["mms_alphas"], mms_alpha(V, A, mmss))
+            push!(stats.mms_alphas, mms_alpha(V, A, mmss))
         end
 
         count += 1

@@ -3,7 +3,7 @@ mutable struct Experiment
     samples::Int
     timeouts::Int
     constraint::Union{Nothing,Type{<:Constraint}}
-    stats::Dict{AbstractString,Vector{Real}}
+    stats::NamedTuple
 end
 
 function Base.show(io::IO, ::MIME"text/plain", data::Experiment)
@@ -38,7 +38,7 @@ function from_dict(::Type{Experiment}, dict::Dict{<:AbstractString,Any})
     samples = dict["samples"]
     timeouts = dict["timeouts"]
     constraint = Base.eval(Allocations, Symbol(dict["constraint"]))
-    stats = dict["stats"]
+    stats = NamedTuple(Symbol(k) => convert(Vector{Real}, v) for (k, v) in dict["stats"])
 
     return Experiment(benchmark, samples, timeouts, constraint, stats)
 end
@@ -48,12 +48,11 @@ function Base.merge!(data::Experiment, others::Experiment...)
         push!(data.benchmark, d.benchmark)
         data.samples += d.samples
         data.timeouts += d.timeouts
-        for (k, v) in d.stats
+        for (k, v) in pairs(d.stats)
             if haskey(data.stats, k)
                 append!(data.stats[k], v)
             else
-                @warn "unknown key when merging experiments"
-                data.stats[k] = v
+                @warn "unknown key when merging experiments" k
             end
         end
     end
