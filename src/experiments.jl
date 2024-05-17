@@ -21,6 +21,23 @@ function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
 end
 
 
+function mnw_matroid_lazy_knu74_ranks(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+    multi_exp = MultiExperiment()
+    samples = max(samples ÷ 8, 1)
+
+    for r in 2:9
+        rng = gen_rng()
+        function gen_matroids(_, m)
+            return MatroidConstraint(rand_matroid_knu74(m, r=r, rng=rng))
+        end
+
+        multi_exp.experiments["rank $r"] = experiment_mip(alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->18:18)
+    end
+
+    return multi_exp
+end
+
+
 function mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
     function gen_matroid(_, m)

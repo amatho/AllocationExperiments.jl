@@ -31,8 +31,10 @@ end
 
 export
     Experiment,
+    MultiExperiment,
     mnw_matroid_lazy_knu74,
     mnw_matroid_asym_lazy_knu74,
+    mnw_matroid_lazy_knu74_ranks,
     mnw_matroid_lazy_er59,
     mnw_matroid_asym_lazy_er59,
     mnw_unconstrained,
