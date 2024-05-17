@@ -1,6 +1,7 @@
 mutable struct Experiment
     benchmark::BenchmarkTools.Trial
     samples::Int
+    timeouts::Int
     constraint::Union{Nothing,Type{<:Constraint}}
     stats::Dict{AbstractString,Vector{Real}}
 end
@@ -21,7 +22,8 @@ function to_json(data::Experiment)
     BenchmarkTools.save(bench_json, data.benchmark)
     dict["benchmark"] = JSON.JSONText(String(take!(bench_json)))
     dict["samples"] = data.samples
-    dict["constraint"] = Base.typename(data.constraint).name
+    dict["timeouts"] = data.timeouts
+    dict["constraint"] = isnothing(data.constraint) ? nothing : Base.typename(data.constraint).name
     dict["stats"] = data.stats
 
     return JSON.json(dict)
@@ -34,16 +36,18 @@ function from_dict(::Type{Experiment}, dict::Dict{<:AbstractString,Any})
     benchmark = only(BenchmarkTools.load(bench_json))
 
     samples = dict["samples"]
+    timeouts = dict["timeouts"]
     constraint = Base.eval(Allocations, Symbol(dict["constraint"]))
     stats = dict["stats"]
 
-    return Experiment(benchmark, samples, constraint, stats)
+    return Experiment(benchmark, samples, timeouts, constraint, stats)
 end
 
 function Base.merge!(data::Experiment, others::Experiment...)
     for d in others
         push!(data.benchmark, d.benchmark)
         data.samples += d.samples
+        data.timeouts += d.timeouts
         for (k, v) in d.stats
             if haskey(data.stats, k)
                 append!(data.stats[k], v)
@@ -60,8 +64,8 @@ end
 function Base.push!(t::BenchmarkTools.Trial, other::BenchmarkTools.Trial)
     append!(t.times, other.times)
     append!(t.gctimes, other.gctimes)
-    other.memory < t.memory && (t.memory = memory)
-    other.allocs < t.allocs && (t.allocs = allocs)
+    other.memory < t.memory && (t.memory = other.memory)
+    other.allocs < t.allocs && (t.allocs = other.allocs)
     t.params.samples += other.params.samples
     return t
 end
@@ -118,5 +122,5 @@ function mergefiles(t::Type, prefix::AbstractString, ext=".json")
         push!(files, string(prefix, i, ext))
         i += 1
     end
-    return merge!((load(t, f) for f in files)...)
+    return isempty(files) ? nothing : merge!((load(t, f) for f in files)...)
 end

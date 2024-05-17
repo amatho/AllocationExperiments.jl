@@ -125,6 +125,7 @@ function experiment_mip(
     end
 
     count = 0
+    timeouts = 0
     constraint = nothing
     stats = Dict{String,Vector{<:Real}}()
     stats["agents"] = Int[]
@@ -140,7 +141,9 @@ function experiment_mip(
             return
         end
 
-        if !isnothing(res)
+        if isnothing(res)
+            timeouts += 1
+        else
             CONF.LOG && count % CONF.LOG_EACH == 0 && @info "Finished sample number $count"
 
             A = res.alloc
@@ -169,5 +172,5 @@ function experiment_mip(
 
     b = @benchmark res = $run(V, C) setup = ((V, C) = $gen(); res = nothing) teardown = ($collect(res, V, C)) samples = samples evals = 1 seconds = Inf
 
-    return Experiment(b, samples, constraint, stats)
+    return Experiment(b, samples, timeouts, constraint, stats)
 end
