@@ -7,7 +7,7 @@ function mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraint(rand_matroid_knu74(m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
+    return experiment_mip(alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
 end
 
 
@@ -17,7 +17,7 @@ function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_asym_lazy_knu74), alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
+    return experiment_mip(alloc_mnw, gen_matroids, rng=gen_rng(), samples=samples, m=n->2n:3n)
 end
 
 
@@ -27,7 +27,7 @@ function mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraint(rand_matroid_er59(m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_lazy_er59), alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
@@ -37,13 +37,13 @@ function mnw_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mnw_matroid_asym_lazy_er59), alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(alloc_mnw, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
 function mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
-    return experiment_mip(Symbol(mnw_unconstrained), alloc_mnw, rng=rng, samples=samples)
+    return experiment_mip(alloc_mnw, rng=rng, samples=samples)
 end
 
 
@@ -53,7 +53,7 @@ function mms_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraint(rand_matroid_er59(m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mms_matroid_lazy_er59), alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
@@ -63,18 +63,17 @@ function mms_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
         return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
     end
 
-    return experiment_mip(Symbol(mms_matroid_asym_lazy_er59), alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
+    return experiment_mip(alloc_mms, gen_matroid, rng=gen_rng(), samples=samples)
 end
 
 
 function mms_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
     rng = gen_rng()
-    return experiment_mip(Symbol(mms_unconstrained), alloc_mms, rng=rng, samples=samples)
+    return experiment_mip(alloc_mms, rng=rng, samples=samples)
 end
 
 
 function experiment_mip(
-    name::Symbol,
     alloc_func::Function,
     gen_constraint::Union{Nothing,Function}=nothing;
     rng=default_rng(),
@@ -109,12 +108,18 @@ function experiment_mip(
     end
 
     count = 0
-    ef1_checks = Bool[]
-    efx_checks = Bool[]
-    mms_alphas = Float64[]
+    constraint = nothing
+    stats = Dict{String,Vector{<:Real}}()
+    stats["agents"] = Int[]
+    stats["items"] = Int[]
+    stats["ranks"] = Float64[]
+    stats["ef1_checks"] = Bool[]
+    stats["efx_checks"] = Bool[]
+    stats["mms_alphas"] = Float64[]
     function collect(res, V, C)
         if count == 0
             count += 1
+            isnothing(C) || (constraint = typeof(C))
             return
         end
 
@@ -123,14 +128,23 @@ function experiment_mip(
 
             A = res.alloc
 
+            push!(stats["agents"], na(A))
+            push!(stats["items"], ni(A))
+
             @assert check(V, A, C) "Allocation does not satisfy matroid constraint"
 
-            push!(ef1_checks, check_ef1(V, A))
-            push!(efx_checks, check_efx(V, A))
+            if isa(C, MatroidConstraint)
+                push!(stats["ranks"], rank(C.matroid))
+            elseif isa(C, MatroidConstraints)
+                push!(stats["ranks"], mean(rank(M) for M in C.matroids))
+            end
+
+            push!(stats["ef1_checks"], check_ef1(V, A))
+            push!(stats["efx_checks"], check_efx(V, A))
 
             # TODO: Use constraint when calculating MMS
             mmss = [mms(V, i, solver=solver, min_owners=0).mms for i in agents(V)]
-            push!(mms_alphas, mms_alpha(V, A, mmss))
+            push!(stats["mms_alphas"], mms_alpha(V, A, mmss))
         end
 
         count += 1
@@ -138,5 +152,5 @@ function experiment_mip(
 
     b = @benchmark res = $run(V, C) setup = ((V, C) = $gen(); res = nothing) teardown = ($collect(res, V, C)) samples = samples evals = 1 seconds = TIME_LIMIT * samples
 
-    return Experiment(name, b, samples, ef1_checks, efx_checks, mms_alphas)
+    return Experiment(b, samples, constraint, stats)
 end

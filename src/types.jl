@@ -1,10 +1,8 @@
 struct Experiment
-    name::Symbol
     benchmark::BenchmarkTools.Trial
     samples::Int
-    ef1_checks::Vector{Bool}
-    efx_checks::Vector{Bool}
-    mms_alphas::Vector{Float64}
+    constraint::Union{Nothing,Type{<:Constraint}}
+    stats::Dict{AbstractString,Vector{Real}}
 end
 
 function Base.show(io::IO, ::MIME"text/plain", data::Experiment)
@@ -22,12 +20,10 @@ function save(filename::AbstractString, data::Experiment)
         dict = Dict()
         bench_json = IOBuffer()
         BenchmarkTools.save(bench_json, data.benchmark)
-        dict["name"] = data.name
         dict["benchmark"] = JSON.JSONText(String(take!(bench_json)))
         dict["samples"] = data.samples
-        dict["ef1_checks"] = data.ef1_checks
-        dict["efx_checks"] = data.efx_checks
-        dict["mms_alphas"] = data.mms_alphas
+        dict["constraint"] = data.constraint
+        dict["stats"] = data.stats
 
         JSON.print(f, dict)
     end
@@ -41,33 +37,34 @@ function load(filename::AbstractString, ::Type{Experiment})
     bench_json = seekstart(bench_json)
     benchmark = only(BenchmarkTools.load(bench_json))
 
-    name = Symbol(dict["name"])
     samples = dict["samples"]
-    ef1_checks = dict["ef1_checks"]
-    efx_checks = dict["efx_checks"]
-    mms_alphas = dict["mms_alphas"]
+    constraint = getfield(Allocations, Symbol(dict["constraint"]))
+    stats = dict["stats"]
 
-    return Experiment(name, benchmark, samples, ef1_checks, efx_checks, mms_alphas)
+    return Experiment(benchmark, samples, constraint, stats)
 end
 load(filename::AbstractString) = load(filename, Experiment)
 
 function Base.merge(data::Experiment, others...)
-    name = data.name
     benchmark = copy(data.benchmark)
     samples = data.samples
-    ef1_checks = data.ef1_checks
-    efx_checks = data.efx_checks
-    mms_alphas = data.mms_alphas
+    constraint = data.constraint
+    stats = data.stats
 
-    for (i, d) in enumerate(others)
+    for d in others
         push!(benchmark, d.benchmark)
         samples += d.samples
-        append!(ef1_checks, d.ef1_checks)
-        append!(efx_checks, d.efx_checks)
-        append!(mms_alphas, d.mms_alphas)
+        for (k, v) in d.stats
+            if haskey(data.stats, k)
+                append!(data.stats[k], v)
+            else
+                @warn "unknown key when merging experiments"
+                data.stats[k] = v
+            end
+        end
     end
 
-    return Experiment(name, benchmark, samples, ef1_checks, efx_checks, mms_alphas)
+    return Experiment(benchmark, samples, constraint, stats)
 end
 
 function Base.push!(t::BenchmarkTools.Trial, other::BenchmarkTools.Trial)
@@ -79,7 +76,12 @@ function Base.push!(t::BenchmarkTools.Trial, other::BenchmarkTools.Trial)
     return t
 end
 
-function mergefiles(files...)
-    data = [load(f) for f in files]
-    return merge(data...)
+function mergefiles(prefix::AbstractString, ext=".json")
+    files = String[]
+    i = 1
+    while isfile(string(prefix, i, ext))
+        push!(files, string(prefix, i, ext))
+        i += 1
+    end
+    return merge((load(f) for f in files)...)
 end
