@@ -1,88 +1,85 @@
-create_gurobi() = optimizer_with_attributes(() -> Gurobi.Optimizer(GRB_ENV_REF[]), "LogToConsole" => 0, "TimeLimit" => TIME_LIMIT)
-
-function mnw_matroid_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroids(rng, _, m)
-        return MatroidConstraint(rand_matroid_knu74(m, rng=rng))
-    end
-
-    return experiment_mip(alloc_mnw, gen_matroids, gen_rng=gen_rng, samples=samples, m=n->2n:3n)
+function knu74_sym(rng, n, m)
+    return MatroidConstraint(rand_matroid_knu74(m, rng=rng, r=2:(m÷n + 1)))
 end
 
-function mnw_matroid_asym_lazy_knu74(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroids(rng, n, m)
-        return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng))
-    end
-
-    return experiment_mip(alloc_mnw, gen_matroids, gen_rng=gen_rng, samples=samples, m=n->2n:3n)
+function knu74_asym(rng, n, m)
+    return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng, r=2:(m÷n + 1)))
 end
 
-function mnw_matroid_lazy_knu74_ranks(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
+function er59_sym(rng, n, m)
+    return MatroidConstraint(rand_matroid_er59(m, rng=rng, r=2:(m÷n + 1)))
+end
+
+function er59_asym(rng, n, m)
+    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, r=2:(m÷n + 1)))
+end
+
+mnw_matroid_lazy_knu74(; kwds...) =
+    experiment_mip(alloc_mnw, knu74_sym; kwds...)
+
+mnw_matroid_lazy_knu74_asym(; kwds...) =
+    experiment_mip(alloc_mnw, knu74_asym; kwds...)
+
+function mnw_matroid_lazy_knu74_ranks(; samples=SAMPLES, kwds...)
     multi_exp = MultiExperiment()
     samples = max(samples ÷ 8, 1)
 
     for r in 2:9
         function gen_matroids(rng, _, m)
-            return MatroidConstraint(rand_matroid_knu74(m, r=r, rng=rng))
+            return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
         end
 
-        multi_exp.experiments["rank $r"] = experiment_mip(alloc_mnw, gen_matroids, gen_rng=gen_rng, samples=samples, m=n->18:18)
+        multi_exp.experiments["rank $r"] = experiment_mip(alloc_mnw, gen_matroids; samples=samples, kwds...)
     end
 
     return multi_exp
 end
 
-function mnw_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroid(rng, _, m)
-        return MatroidConstraint(rand_matroid_er59(m, rng=rng))
-    end
+mnw_matroid_lazy_er59(; kwds...) =
+    experiment_mip(alloc_mnw, er59_sym; kwds...)
 
-    return experiment_mip(alloc_mnw, gen_matroid, gen_rng=gen_rng, samples=samples)
-end
+mnw_matroid_lazy_er59_asym(; kwds...) =
+    experiment_mip(alloc_mnw, er59_asym; kwds...)
 
-function mnw_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroid(rng, n, m)
-        return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
-    end
+mnw_matroid_loop_knu74(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu74_sym; solver=CONF.HIGHS, kwds...)
 
-    return experiment_mip(alloc_mnw, gen_matroid, gen_rng=gen_rng, samples=samples)
-end
+mnw_matroid_loop_knu74_asym(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu74_asym; solver=CONF.HIGHS, kwds...)
 
-mnw_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES) =
-    experiment_mip(alloc_mnw, gen_rng=gen_rng, samples=samples)
+mnw_matroid_loop_er59(; kwds...) =
+    experiment_mip(alloc_mnw_loop, er59_sym; solver=CONF.HIGHS, kwds...)
 
-function mms_matroid_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroid(rng, _, m)
-        return MatroidConstraint(rand_matroid_er59(m, rng=rng))
-    end
+mnw_matroid_loop_er59_asym(; kwds...) =
+    experiment_mip(alloc_mnw_loop, er59_asym; solver=CONF.HIGHS, kwds...)
 
-    return experiment_mip(alloc_mms, gen_matroid, gen_rng=gen_rng, samples=samples)
-end
+mnw_unconstrained(; kwds...) =
+    experiment_mip(alloc_mnw; kwds...)
 
-function mms_matroid_asym_lazy_er59(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES)
-    function gen_matroid(rng, n, m)
-        return MatroidConstraints(rand_matroid_er59(n, m, rng=rng))
-    end
+mms_matroid_lazy_er59(; kwds...) =
+    experiment_mip(alloc_mms, er59_sym; kwds...)
 
-    return experiment_mip(alloc_mms, gen_matroid, gen_rng=gen_rng, samples=samples)
-end
+mms_matroid_lazy_er59_asym(; kwds...) =
+    experiment_mip(alloc_mms, er59_asym; kwds...)
 
-mms_unconstrained(; gen_rng=DEFAULT_GEN_RNG, samples=SAMPLES) =
-    experiment_mip(alloc_mms, gen_rng=gen_rng, samples=samples)
+mms_unconstrained(; kwds...) =
+    experiment_mip(alloc_mms; kwds...)
 
 function experiment_mip(
     alloc_func::Function,
     gen_constraint::Union{Nothing,Function}=nothing;
     gen_rng=DEFAULT_GEN_RNG,
     samples=SAMPLES,
+    solver=CONF.GUROBI,
     n=2:6,
-    m=n->2n:4n
+    m=n->2n:3n,
+    v=(n, m)->DiscreteUniform(1, 50)
 )
-    solver = create_gurobi()
     v_rng = gen_rng()
     c_rng = gen_rng()
 
     function gen()
-        V = rand_additive(n=n, m=m, v=VALUATION, rng=v_rng)
+        V = rand_additive(n=n, m=m, v=v, rng=v_rng)
         C = isnothing(gen_constraint) ? nothing : gen_constraint(c_rng, na(V), ni(V))
 
         return (V, C)

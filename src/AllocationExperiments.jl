@@ -6,6 +6,7 @@ using BenchmarkTools
 using Distributions: DiscreteUniform
 using Graphs
 using Gurobi
+using HiGHS
 import JSON
 using JuMP
 using Logging
@@ -17,27 +18,21 @@ include("consts.jl")
 include("types.jl")
 include("experiments.jl")
 
-function __init__()
-    global GRB_ENV_REF
-    GRB_ENV_REF[] = Gurobi.Env()
-
-    debug_logger = Logging.ConsoleLogger(Logging.Info)
-    Logging.global_logger(debug_logger)
-
-    return
-end
-
 export
     Experiment,
     MultiExperiment,
     mnw_matroid_lazy_knu74,
-    mnw_matroid_asym_lazy_knu74,
+    mnw_matroid_lazy_knu74_asym,
     mnw_matroid_lazy_knu74_ranks,
     mnw_matroid_lazy_er59,
-    mnw_matroid_asym_lazy_er59,
+    mnw_matroid_lazy_er59_asym,
+    mnw_matroid_loop_knu74,
+    mnw_matroid_loop_knu74_asym,
+    mnw_matroid_loop_er59,
+    mnw_matroid_loop_er59_asym
     mnw_unconstrained,
     mms_matroid_lazy_er59,
-    mms_matroid_asym_lazy_er59,
+    mms_matroid_lazy_er59_asym,
     mms_unconstrained,
     rng_with_seed,
     save,
