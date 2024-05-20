@@ -1,17 +1,17 @@
-function knu74_sym(rng, n, m)
-    return MatroidConstraint(rand_matroid_knu74(m, rng=rng, r=2:(m÷n + 1)))
+function knu74_sym(rng, _, m)
+    return MatroidConstraint(rand_matroid_knu74(m, rng=rng, r=2:4))
 end
 
 function knu74_asym(rng, n, m)
-    return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng, r=2:(m÷n + 1)))
+    return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng, r=2:4))
 end
 
-function er59_sym(rng, n, m)
-    return MatroidConstraint(rand_matroid_er59(m, rng=rng, r=2:(m÷n + 1)))
+function er59_sym(rng, _, m)
+    return MatroidConstraint(rand_matroid_er59(m, rng=rng, r=2:4))
 end
 
 function er59_asym(rng, n, m)
-    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, r=2:(m÷n + 1)))
+    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, r=2:4))
 end
 
 mnw_matroid_lazy_knu74(; kwds...) =
@@ -24,12 +24,12 @@ function mnw_matroid_lazy_knu74_ranks(; samples=SAMPLES, kwds...)
     multi_exp = MultiExperiment()
     samples = max(samples ÷ 8, 1)
 
-    for r in 2:9
+    for r in 1:8
         function gen_matroids(rng, _, m)
             return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
         end
 
-        multi_exp.experiments["rank $r"] = experiment_mip(alloc_mnw, gen_matroids; samples=samples, kwds...)
+        multi_exp.experiments["rank $r"] = experiment_mip(alloc_mnw, gen_matroids; samples=samples, n=2:4, m=n->2n:4n, kwds...)
     end
 
     return multi_exp
@@ -71,8 +71,8 @@ function experiment_mip(
     gen_rng=DEFAULT_GEN_RNG,
     samples=SAMPLES,
     solver=CONF.GUROBI,
-    n=2:6,
-    m=n->2n:3n,
+    n=2:7,
+    m=n->2n:4n,
     v=(n, m)->DiscreteUniform(1, 50)
 )
     v_rng = gen_rng()
