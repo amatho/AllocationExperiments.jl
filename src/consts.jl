@@ -5,7 +5,7 @@ mutable struct Conf
     HIGHS
 end
 
-const CONF = Conf(false, 10, nothing, nothing)
+const CONF = Conf(true, 100, nothing, nothing)
 const GRB_ENV_REF = Ref{Gurobi.Env}()
 const TIME_LIMIT = 300
 const SAMPLES = 1000
