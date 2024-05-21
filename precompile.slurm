@@ -18,4 +18,4 @@ module purge
 module load Julia/1.9.3-linux-x86_64
 module list
 
-julia run_precompile.jl
+unbuffer julia run_precompile.jl
