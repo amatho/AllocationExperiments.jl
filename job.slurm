@@ -1,7 +1,7 @@
 #!/bin/sh
 #SBATCH --partition=CPUQ
 #SBATCH --account=ie-idi
-#SBATCH --time=0-05:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH -c 8
 #SBATCH --mem=12G
@@ -19,4 +19,4 @@ module purge
 module load Julia/1.9.3-linux-x86_64
 module list
 
-julia run_job.jl $SLURM_ARRAY_TASK_ID 1000 # Enter experiment here
+unbuffer julia run_job.jl $SLURM_ARRAY_TASK_ID 1000 # Enter experiment here
