@@ -157,6 +157,7 @@ function experiment_mip(
     end
 
     b = @benchmark res = $run(V, C) setup = ((V, C) = $gen(); res = nothing) teardown = ($collect(res, V, C)) samples = samples evals = 1 seconds = Inf
+    remove_timeouts!(b, TIME_LIMIT)
 
     return Experiment(b, samples, timeouts, constraint, stats)
 end
