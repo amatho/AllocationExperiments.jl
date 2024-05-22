@@ -9,6 +9,7 @@ function check_and_fix(ctx, C::MatroidConstraint)
             r = rank(M, B)
             for i in agents(V)
                 @constraint(model, sum(A[i, g] for g in B) <= r)
+                ctx.added_constraints += 1
             end
         end
     end
@@ -26,8 +27,11 @@ function check_and_fix(ctx, C::MatroidConstraints)
             satisfies = false
             r = rank(M, B)
             @constraint(model, sum(A[i, g] for g in B) <= r)
+            ctx.added_constraints += 1
         end
     end
+
+    return satisfies
 end
 
 set_initial_constraints(ctx, V, C::MatroidConstraint) = for i in agents(V)
