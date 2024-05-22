@@ -118,7 +118,7 @@ function experiment_mip(
     timeouts = 0
     constraint = nothing
     stats = (agents=Int[], items=Int[], ranks=Float64[], ef1_checks=Bool[],
-        efx_checks=Bool[], mms_alphas=Float64[])
+        efx_checks=Bool[], mms_alphas=Float64[], complete_checks=Bool[])
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -146,6 +146,7 @@ function experiment_mip(
 
             push!(stats.ef1_checks, check_ef1(V, A))
             push!(stats.efx_checks, check_efx(V, A))
+            push!(stats.complete_checks, check_complete(A))
 
             # TODO: Use constraint when calculating MMS
             mmss = [mms(V, i, solver=solver, min_owners=0).mms for i in agents(V)]
