@@ -7,11 +7,13 @@ function knu74_asym(rng, n, m)
 end
 
 function er59_sym(rng, _, m)
-    return MatroidConstraint(rand_matroid_er59(m, rng=rng, r=2:4))
+    min_verts = ceil(Int, sqrt(2 * m) + (1 / 2))
+    return MatroidConstraint(rand_matroid_er59(m, rng=rng, verts=min_verts:m))
 end
 
 function er59_asym(rng, n, m)
-    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, r=2:4))
+    min_verts = ceil(Int, sqrt(2 * m) + (1 / 2))
+    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, verts=min_verts:m))
 end
 
 mnw_matroid_lazy_knu74(; kwds...) =
@@ -68,6 +70,12 @@ mnw_matroid_loop_er59_asym_highs(; kwds...) =
 mnw_unconstrained(; kwds...) =
     experiment_mip(alloc_mnw; kwds...)
 
+mms_matroid_lazy_knu74(; kwds...) =
+    experiment_mip(alloc_mms, knu74_sym; kwds...)
+
+mms_matroid_lazy_knu74_asym(; kwds...) =
+    experiment_mip(alloc_mms, knu74_asym; kwds...)
+
 mms_matroid_lazy_er59(; kwds...) =
     experiment_mip(alloc_mms, er59_sym; kwds...)
 
@@ -101,7 +109,11 @@ function experiment_mip(
         res = nothing
 
         try
-            res = alloc_func(V, C, solver=solver, min_owners=0)
+            if alloc_func == alloc_mms
+                res = alloc_func(V, C, solver=solver, min_owners=0, cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
+            else
+                res = alloc_func(V, C, solver=solver, min_owners=0)
+            end
         catch e
             if isa(e, AssertionError)
                 @warn "MIP probably reached time limit" TIME_LIMIT err = e.msg
@@ -146,17 +158,23 @@ function experiment_mip(
             end
 
             is_ef1 = check_ef1(V, A)
-            if !is_ef1
-                push!(stats.not_ef1, V => C)
-            end
-
             push!(stats.ef1, is_ef1)
             push!(stats.efx, check_efx(V, A))
             push!(stats.complete, check_complete(A))
-            push!(stats.constraints, res.added_constraints)
 
-            # TODO: Use constraint when calculating MMS
-            mmss = [mms(V, i, solver=solver, min_owners=0).mms for i in agents(V)]
+            if alloc_func == alloc_mms
+                mmss = res.mmss
+
+                constraints = res.added_constraints + round(Int, mean(res.mms_added_constraints))
+                push!(stats.constraints, constraints)
+            else
+                if !is_ef1
+                    push!(stats.not_ef1, V => C)
+                end
+                push!(stats.constraints, res.added_constraints)
+
+                mmss = [mms(V, i, C, solver=CONF.GUROBI_MMS, min_owners=0).mms for i in agents(V)]
+            end
             push!(stats.mms_alphas, mms_alpha(V, A, mmss))
         end
 

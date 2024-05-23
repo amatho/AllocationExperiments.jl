@@ -1,11 +1,12 @@
 mutable struct Conf
     LOG::Bool
-    LOG_EACH::UInt
+    LOG_EACH::Int
     GUROBI
+    GUROBI_MMS
     HIGHS
 end
 
-const CONF = Conf(true, 100, nothing, nothing)
+const CONF = Conf(true, 100, nothing, nothing, nothing)
 const GRB_ENV_REF = Ref{Gurobi.Env}()
 const TIME_LIMIT = 300
 const SAMPLES = 1000
@@ -17,11 +18,15 @@ function __init__()
     Logging.global_logger(debug_logger)
 
     global GRB_ENV_REF
-    GRB_ENV_REF[] = Gurobi.Env()
+    GRB_ENV_REF[] = Gurobi.Env(output_flag=0)
     CONF.GUROBI = optimizer_with_attributes(
         () -> Gurobi.Optimizer(GRB_ENV_REF[]),
-        "LogToConsole" => 0,
         "TimeLimit" => TIME_LIMIT
+    )
+    CONF.GUROBI_MMS = optimizer_with_attributes(
+        () -> Gurobi.Optimizer(GRB_ENV_REF[]),
+        "TimeLimit" => TIME_LIMIT,
+        "MIPGap" => 0.05
     )
 
     CONF.HIGHS = optimizer_with_attributes(

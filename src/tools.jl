@@ -1,3 +1,7 @@
+function set_log_each(val::Integer)
+    CONF.LOG_EACH = val
+end
+
 function rng_with_seed(seed)
     return function ()
         Xoshiro(seed)
