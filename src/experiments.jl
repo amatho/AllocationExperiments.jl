@@ -117,9 +117,9 @@ function experiment_mip(
     count = 0
     timeouts = 0
     constraint = nothing
-    stats = (agents=Int[], items=Int[], ranks=Float64[], ef1_checks=Bool[],
-        efx_checks=Bool[], mms_alphas=Float64[], complete_checks=Bool[],
-        added_constraints=Int[])
+    stats = (agents=Int[], items=Int[], ranks=Float64[], ef1=Bool[], efx=Bool[],
+        mms_alphas=Float64[], complete=Bool[], constraints=Int[],
+        not_ef1=Pair{Profile,Constraint}[])
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -145,10 +145,15 @@ function experiment_mip(
                 push!(stats.ranks, mean(rank(M) for M in C.matroids))
             end
 
-            push!(stats.ef1_checks, check_ef1(V, A))
-            push!(stats.efx_checks, check_efx(V, A))
-            push!(stats.complete_checks, check_complete(A))
-            push!(stats.added_constraints, res.added_constraints)
+            is_ef1 = check_ef1(V, A)
+            if !is_ef1
+                push!(stats.not_ef1, V => C)
+            end
+
+            push!(stats.ef1, is_ef1)
+            push!(stats.efx, check_efx(V, A))
+            push!(stats.complete, check_complete(A))
+            push!(stats.constraints, res.added_constraints)
 
             # TODO: Use constraint when calculating MMS
             mmss = [mms(V, i, solver=solver, min_owners=0).mms for i in agents(V)]
