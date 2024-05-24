@@ -19,4 +19,4 @@ module purge
 module load Julia/1.9.3-linux-x86_64
 module list
 
-unbuffer julia run_job.jl $SLURM_ARRAY_TASK_ID 100 # Enter experiment here
+unbuffer julia --heap-size-hint=12G run_job.jl $SLURM_ARRAY_TASK_ID 100 # Enter experiment here
