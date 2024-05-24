@@ -7,7 +7,7 @@ using Distributions: DiscreteUniform
 using Graphs
 using Gurobi
 using HiGHS
-import JSON
+using JLD2
 using JuMP
 using Logging
 using Random: default_rng, Xoshiro
