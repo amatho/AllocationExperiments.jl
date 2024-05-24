@@ -173,7 +173,11 @@ function experiment_mip(
                 end
                 push!(stats.constraints, res.added_constraints)
 
-                mmss = [mms(V, i, C, solver=CONF.GUROBI_MMS, min_owners=0).mms for i in agents(V)]
+                try
+                    mmss = [mms(V, i, C, solver=CONF.GUROBI_MMS, min_owners=0).mms for i in agents(V)]
+                catch
+                    mmss = zeros(na(V))
+                end
             end
             push!(stats.mms_alphas, mms_alpha(V, A, mmss))
         end
