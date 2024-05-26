@@ -4,7 +4,7 @@
 #SBATCH --time=1-00:00:00
 #SBATCH --nodes=1
 #SBATCH -c 8
-#SBATCH --mem=16G
+#SBATCH --mem=32G
 #SBATCH --constraint="pec6520"
 #SBATCH --array=1-10
 #SBATCH --job-name="matroid_experiments"
@@ -19,4 +19,4 @@ module purge
 module load Julia/1.9.3-linux-x86_64
 module list
 
-unbuffer julia --heap-size-hint=12G run_job.jl $SLURM_ARRAY_TASK_ID 100 # Enter experiment here
+unbuffer julia --heap-size-hint=16G run_job.jl $SLURM_ARRAY_TASK_ID 100 # Enter experiment here
