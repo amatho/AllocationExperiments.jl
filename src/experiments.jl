@@ -102,6 +102,9 @@ function experiment_mip(
         V = rand_additive(n=n, m=m, v=v, rng=v_rng)
         C = isnothing(gen_constraint) ? nothing : gen_constraint(c_rng, na(V), ni(V))
 
+        # Run GC after generating instance
+        BenchmarkTools.gcscrub()
+
         return (V, C)
     end
 
