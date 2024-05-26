@@ -1,12 +1,15 @@
 # AllocationExperiments.jl
 
-A collection of experiments for benchmarking and evaluating the different [fair allocation](https://en.wikipedia.org/wiki/Fair_item_allocation)
-algorithms in [Allocations.jl](https://github.com/mlhetland/Allocations.jl), focusing on the use of matroid constraints.
+A collection of experiments for benchmarking and evaluating the different
+[fair allocation](https://en.wikipedia.org/wiki/Fair_item_allocation) algorithms in
+[Allocations.jl](https://github.com/mlhetland/Allocations.jl), focusing on the use of
+[matroid](https://en.wikipedia.org/wiki/Matroid) constraints.
 
 ## Running the experiments
 
-In order to run most of the experiments you will need a license for Gurobi (which is free for academics). Follow the instructions of
-[Gurobi.jl](https://github.com/jump-dev/Gurobi.jl) if you have trouble with getting Gurobi to work in Julia.
+In order to run most of the experiments you will need a license for Gurobi (which is free for academics). Follow
+the instructions of [Gurobi.jl](https://github.com/jump-dev/Gurobi.jl) if you have trouble with getting Gurobi
+to work in Julia.
 
 First off, you will need to activate the environment by running `activate` in the Julia Pkg REPL:
 ```julia
