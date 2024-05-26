@@ -85,6 +85,18 @@ mms_matroid_lazy_er59_asym(; kwds...) =
 mms_unconstrained(; kwds...) =
     experiment_mip(alloc_mms; kwds...)
 
+rnd_matroid_lazy_knu74(; kwds...) =
+    experiment_mip(Allocations.alloc_rand_mip, knu74_sym; kwds...)
+
+rnd_matroid_lazy_knu74_asym(; kwds...) =
+    experiment_mip(Allocations.alloc_rand_mip, knu74_asym; kwds...)
+
+rnd_matroid_lazy_er59(; kwds...) =
+    experiment_mip(Allocations.alloc_rand_mip, er59_sym; kwds...)
+
+rnd_matroid_lazy_er59_asym(; kwds...) =
+    experiment_mip(Allocations.alloc_rand_mip, er59_asym; kwds...)
+
 function experiment_mip(
     alloc_func::Function,
     gen_constraint::Union{Nothing,Function}=nothing;
@@ -165,15 +177,16 @@ function experiment_mip(
             push!(stats.efx, check_efx(V, A))
             push!(stats.complete, check_complete(A))
 
+            if (alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop) && !is_ef1
+                push!(stats.not_ef1, V => C)
+            end
+
             if alloc_func == alloc_mms
                 mmss = res.mmss
 
-                constraints = res.added_constraints + round(Int, mean(res.mms_added_constraints))
+                constraints = res.added_constraints + sum(res.mms_added_constraints)
                 push!(stats.constraints, constraints)
             else
-                if !is_ef1
-                    push!(stats.not_ef1, V => C)
-                end
                 push!(stats.constraints, res.added_constraints)
 
                 try
