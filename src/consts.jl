@@ -40,7 +40,7 @@ function __init__()
     end
     mem = parse_env(Int, "SLURM_MEM_PER_NODE")
     if !isnothing(mem)
-        push!(gurobi_attributes, "SoftMemLimit" => mem / 1000)
+        push!(gurobi_attributes, "SoftMemLimit" => mem / 1024)
     end
 
     display(gurobi_attributes)
