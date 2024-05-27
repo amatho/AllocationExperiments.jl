@@ -22,7 +22,8 @@ function Base.merge!(data::Experiment, others::Experiment...)
         push!(data.benchmark, d.benchmark)
         data.samples += d.samples
         data.timeouts += d.timeouts
-        data.constraint != d.constraint && @warn "different constraints when merging" c1=data.constraint c2=d.constraint
+        data.constraint != d.constraint && @warn "different constraints when merging" a=data.constraint b=d.constraint
+        data.solver != d.solver && @warn "different solvers when merging" a=data.solver b=d.solver
         for (k, v) in pairs(d.stats)
             if haskey(data.stats, k)
                 append!(data.stats[k], v)
