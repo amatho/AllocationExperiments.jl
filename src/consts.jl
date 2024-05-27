@@ -43,9 +43,6 @@ function __init__()
         push!(gurobi_attributes, "SoftMemLimit" => mem / 1024)
     end
 
-    display(gurobi_attributes)
-    display(highs_attributes)
-
     CONF.GUROBI = optimizer_with_attributes(
         () -> Gurobi.Optimizer(GRB_ENV_REF[]),
         gurobi_attributes...
