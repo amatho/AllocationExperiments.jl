@@ -144,6 +144,7 @@ function experiment_mip(
     count = 0
     timeouts = 0
     constraint = nothing
+    solver_name_str = nothing
     stats = (agents=Int[], items=Int[], ranks=Float64[], ef1=Bool[], efx=Bool[],
         mms_alphas=Float64[], complete=Bool[], constraints=Int[],
         not_ef1=Pair{Profile,Constraint}[])
@@ -158,6 +159,10 @@ function experiment_mip(
             timeouts += 1
         else
             CONF.LOG && count % CONF.LOG_EACH == 0 && @info "Finished sample number $count"
+
+            if isnothing(solver_name_str)
+                solver_name_str = solver_name(res.model)
+            end
 
             A = res.alloc
 
@@ -204,5 +209,5 @@ function experiment_mip(
     b = @benchmark res = $run(V, C) setup = ((V, C) = $gen(); res = nothing) teardown = ($collect(res, V, C)) samples = samples evals = 1 seconds = Inf
     remove_timeouts!(b, TIME_LIMIT)
 
-    return Experiment(b, samples, timeouts, constraint, stats)
+    return Experiment(b, samples, timeouts, constraint, solver_name_str, stats)
 end

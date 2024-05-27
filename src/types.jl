@@ -3,6 +3,7 @@ mutable struct Experiment
     samples::Int
     timeouts::Int
     constraint::Union{Nothing,Type{<:Constraint}}
+    solver::AbstractString
     stats::NamedTuple
 end
 
@@ -66,7 +67,7 @@ end
 
 load(filename::AbstractString) = load_object(filename)
 
-save(filename::AbstractString, data::Union{Experiment,MultiExperiment}) = save_object(filename, data)
+save(filename::AbstractString, data) = save_object(filename, data)
 
 function mergefiles(prefix::AbstractString, ext=".jld2")
     files = String[]
