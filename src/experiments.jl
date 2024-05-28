@@ -110,6 +110,15 @@ function experiment_mip(
 )
     v_rng = gen_rng()
     c_rng = gen_rng()
+    r_rng = gen_rng()
+
+    if alloc_func == alloc_mms
+        extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
+    elseif alloc_func == Allocations.alloc_rand_mip
+        extra_kwds = (rng=r_rng,)
+    else
+        extra_kwds = ()
+    end
 
     function gen()
         V = rand_additive(n=n, m=m, v=v, rng=v_rng)
@@ -125,11 +134,7 @@ function experiment_mip(
         res = nothing
 
         try
-            if alloc_func == alloc_mms
-                res = alloc_func(V, C, solver=solver, min_owners=0, cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
-            else
-                res = alloc_func(V, C, solver=solver, min_owners=0)
-            end
+            res = alloc_func(V, C; solver=solver, min_owners=0, extra_kwds...)
         catch e
             if isa(e, AssertionError)
                 @warn "MIP probably reached time limit" TIME_LIMIT err = e.msg

@@ -49,6 +49,7 @@ export
     rng_with_seed,
     save,
     load,
-    mergefiles
+    mergefiles,
+    CONF
 
 end # module AllocationExperiments
