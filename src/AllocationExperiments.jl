@@ -13,9 +13,9 @@ using Logging
 using Random: default_rng, Xoshiro
 using StatsPlots: mean
 
+include("types.jl")
 include("tools.jl")
 include("consts.jl")
-include("types.jl")
 include("alloc_loop.jl")
 include("experiments.jl")
 

@@ -8,10 +8,32 @@ function rng_with_seed(seed)
     end
 end
 
-function remove_timeouts!(b::BenchmarkTools.Trial, time_limit::Int)
-    indices = [i for (i, t) in enumerate(b.times) if t > time_limit * 1e9]
-    for i in reverse(indices)
+function remove_timeouts!(b::BenchmarkTools.Trial, time_limit::Int, target::Int)
+    over_limit = [(i, t) for (i, t) in enumerate(b.times) if t > time_limit * 1e9]
+    len = min(length(over_limit), target)
+    sort!(over_limit, by=x->x[2], rev=true)
+    for (i, _) in @view over_limit[1:len]
         deleteat!(b.times, i)
         deleteat!(b.gctimes, i)
+    end
+end
+
+function fix_missing_times!(data::Experiment, time_limit=TIME_LIMIT)
+    num_missing = data.samples - (data.timeouts + length(data.benchmark))
+    if num_missing <= 0
+        return data
+    end
+
+    times = [time_limit * 1e9 for _ in 1:num_missing]
+    gctimes = [0.0 for _ in 1:num_missing]
+    append!(data.benchmark.times, times)
+    append!(data.benchmark.gctimes, gctimes)
+
+    return data
+end
+
+function fix_missing_times!(data::MultiExperiment)
+    for (_, d) in data.experiments
+        fix_missing_times!(d)
     end
 end
