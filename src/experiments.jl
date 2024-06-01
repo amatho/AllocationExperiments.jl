@@ -87,16 +87,16 @@ mms_unconstrained(; kwds...) =
     experiment_mip(alloc_mms; kwds...)
 
 rnd_matroid_lazy_knu74(; kwds...) =
-    experiment_mip(Allocations.alloc_rand_mip, knu74_sym; kwds...)
+    experiment_mip(alloc_rand_mip, knu74_sym; kwds...)
 
 rnd_matroid_lazy_knu74_asym(; kwds...) =
-    experiment_mip(Allocations.alloc_rand_mip, knu74_asym; kwds...)
+    experiment_mip(alloc_rand_mip, knu74_asym; kwds...)
 
 rnd_matroid_lazy_er59(; kwds...) =
-    experiment_mip(Allocations.alloc_rand_mip, er59_sym; kwds...)
+    experiment_mip(alloc_rand_mip, er59_sym; kwds...)
 
 rnd_matroid_lazy_er59_asym(; kwds...) =
-    experiment_mip(Allocations.alloc_rand_mip, er59_asym; kwds...)
+    experiment_mip(alloc_rand_mip, er59_asym; kwds...)
 
 function experiment_mip(
     alloc_func::Function,
