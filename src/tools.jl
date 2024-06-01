@@ -11,8 +11,10 @@ end
 function remove_timeouts!(b::BenchmarkTools.Trial, time_limit::Int, target::Int)
     over_limit = [(i, t) for (i, t) in enumerate(b.times) if t > time_limit * 1e9]
     len = min(length(over_limit), target)
-    sort!(over_limit, by=x->x[2], rev=true)
-    for (i, _) in @view over_limit[1:len]
+    over_limit = sort!(over_limit, by=x->x[2], rev=true)[1:len]
+    sort!(over_limit, by=x->x[1], rev=true)
+
+    for (i, _) in over_limit
         deleteat!(b.times, i)
         deleteat!(b.gctimes, i)
     end
