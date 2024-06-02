@@ -7,10 +7,28 @@ mutable struct Experiment
     stats::NamedTuple
 end
 
-function Base.show(io::IO, ::MIME"text/plain", data::Experiment)
-    show(io, data)
-    print(io, "\n\n")
-    show(io, MIME"text/plain"(), data.benchmark)
+Base.show(io::IO, data::Experiment) =
+    print(io, "Experiment($(data.samples), $(data.timeouts), $(data.constraint), $(data.solver), …)")
+
+function Base.show(io::IO, m::MIME"text/plain", data::Experiment)
+    println(io, "Experiment with $(data.samples) samples:")
+    println(io, " Timeouts: $(data.timeouts)")
+    println(io, " Constraint: $(data.constraint)")
+    println(io, " Solver: $(data.solver)")
+    println(io, " Stats: ")
+
+    for (k, v) in pairs(data.stats)
+        print(io, "  $k: ")
+        if k == :not_ef1
+            print(io, "$(length(v)) instances")
+        else
+            show(io, v)
+        end
+        print(io, "\n")
+    end
+
+    print(io, "\n")
+    show(io, m, data.benchmark)
 end
 
 function Base.summary(io::IO, data::Experiment)
