@@ -34,8 +34,10 @@ function fix_missing_times!(data::Experiment, time_limit=TIME_LIMIT)
     return data
 end
 
-function fix_missing_times!(data::MultiExperiment)
+function fix_missing_times!(data::MultiExperiment, time_limit=TIME_LIMIT)
     for (_, d) in data.experiments
-        fix_missing_times!(d)
+        fix_missing_times!(d, time_limit)
     end
+
+    return data
 end
