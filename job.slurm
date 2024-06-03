@@ -8,7 +8,7 @@
 #SBATCH --constraint="pec6520"
 #SBATCH --array=1-10
 #SBATCH --job-name="matroid_experiments"
-#SBATCH --output=log/srun_%a.out
+#SBATCH --output=log/slurm_%A_%a.out
 #SBATCH --mail-user=amandust@stud.ntnu.no
 #SBATCH --mail-type=ALL
 
