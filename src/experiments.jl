@@ -22,17 +22,16 @@ mnw_matroid_lazy_knu74(; kwds...) =
 mnw_matroid_lazy_knu74_asym(; kwds...) =
     experiment_mip(alloc_mnw, knu74_asym; kwds...)
 
-function mnw_matroid_lazy_knu74_ranks(; samples=SAMPLES, kwds...)
+function mnw_matroid_lazy_knu74_ranks(; kwds...)
     multi_exp = MultiExperiment()
     r_values = 3:11
-    samples = max(samples ÷ length(r_values), 1)
 
     for r in r_values
         function gen_matroids(rng, _, m)
             return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
         end
 
-        multi_exp.experiments["r=$r"] = experiment_mip(alloc_mnw, gen_matroids; samples=samples, n=3:3, m=n->6n:6n, kwds...)
+        multi_exp.experiments["r=$r"] = experiment_mip(alloc_mnw, gen_matroids; n=3:3, m=n->6n:6n, kwds...)
     end
 
     return multi_exp
@@ -71,6 +70,9 @@ mnw_matroid_loop_er59_asym_highs(; kwds...) =
 mnw_unconstrained(; kwds...) =
     experiment_mip(alloc_mnw; kwds...)
 
+mnw_unconstrained_ranks_comparison(; kwds...) =
+    experiment_mip(alloc_mnw; n=3:3, m=n->6n:6n, kwds...)
+
 mms_matroid_lazy_knu74(; kwds...) =
     experiment_mip(alloc_mms, knu74_sym; kwds...)
 
@@ -92,11 +94,32 @@ rnd_matroid_lazy_knu74(; kwds...) =
 rnd_matroid_lazy_knu74_asym(; kwds...) =
     experiment_mip(alloc_rand_mip, knu74_asym; kwds...)
 
+function rnd_matroid_lazy_knu74_ranks(; kwds...)
+    multi_exp = MultiExperiment()
+    r_values = 3:11
+
+    for r in r_values
+        function gen_matroids(rng, _, m)
+            return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
+        end
+
+        multi_exp.experiments["r=$r"] = experiment_mip(alloc_rand_mip, gen_matroids; n=3:3, m=n->6n:6n, kwds...)
+    end
+
+    return multi_exp
+end
+
 rnd_matroid_lazy_er59(; kwds...) =
     experiment_mip(alloc_rand_mip, er59_sym; kwds...)
 
 rnd_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_rand_mip, er59_asym; kwds...)
+
+rnd_unconstrained(; kwds...) =
+    experiment_mip(alloc_rand_mip; kwds...)
+
+rnd_unconstrained_ranks_comparison(; kwds...) =
+    experiment_mip(alloc_rand_mip; n=3:3, m=n->6n:6n, kwds...)
 
 function experiment_mip(
     alloc_func::Function,
@@ -153,7 +176,7 @@ function experiment_mip(
     solver_name_str = nothing
     stats = (agents=Int[], items=Int[], ranks=Float64[], ef1=Bool[], efx=Bool[],
         mms_alphas=Float64[], complete=Bool[], constraints=Int[],
-        not_ef1=Pair{Profile,Constraint}[])
+        ef_alphas=Float64[], nw=Float64[], not_ef1=Pair{Profile,Constraint}[])
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -187,9 +210,14 @@ function experiment_mip(
             push!(stats.ef1, is_ef1)
             push!(stats.efx, check_efx(V, A))
             push!(stats.complete, check_complete(A))
+            push!(stats.ef_alphas, ef_alpha(V, A))
 
-            if (alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop) && !is_ef1
-                push!(stats.not_ef1, V => C)
+            if (alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop)
+                push!(stats.nw, res.mnw)
+
+                is_ef1 || push!(stats.not_ef1, V => C)
+            else
+                push!(stats.nw, nash_welfare(V, A))
             end
 
             if alloc_func == alloc_mms
