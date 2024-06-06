@@ -22,7 +22,7 @@ function Base.show(io::IO, m::MIME"text/plain", data::Experiment)
         if k == :not_ef1
             print(io, "$(length(v)) instances")
         else
-            show(io, v)
+            show(IOContext(io, :compact => true), v)
         end
         print(io, "\n")
     end
