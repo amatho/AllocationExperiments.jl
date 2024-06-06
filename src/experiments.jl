@@ -96,7 +96,7 @@ rnd_matroid_lazy_knu74_asym(; kwds...) =
 
 function rnd_matroid_lazy_knu74_ranks(; kwds...)
     multi_exp = MultiExperiment()
-    r_values = 3:11
+    r_values = 3:9
 
     for r in r_values
         function gen_matroids(rng, _, m)
@@ -137,7 +137,7 @@ function experiment_mip(
 
     if alloc_func == alloc_mms
         extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
-    elseif alloc_func == Allocations.alloc_rand_mip
+    elseif alloc_func == alloc_rand_mip
         extra_kwds = (rng=r_rng,)
     else
         extra_kwds = ()
@@ -176,7 +176,8 @@ function experiment_mip(
     solver_name_str = nothing
     stats = (agents=Int[], items=Int[], ranks=Float64[], ef1=Bool[], efx=Bool[],
         mms_alphas=Float64[], complete=Bool[], constraints=Int[],
-        ef_alphas=Float64[], nw=Float64[], not_ef1=Pair{Profile,Constraint}[])
+        ef_alphas=Float64[], ef1_alphas=Float64[], efx_alphas=Float64[],
+        nw=Float64[], not_ef1=Pair{Profile,Constraint}[])
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -211,6 +212,8 @@ function experiment_mip(
             push!(stats.efx, check_efx(V, A))
             push!(stats.complete, check_complete(A))
             push!(stats.ef_alphas, ef_alpha(V, A))
+            push!(stats.ef1_alphas, ef1_alpha(V, A))
+            push!(stats.efx_alphas, efx_alpha(V, A))
 
             if (alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop)
                 push!(stats.nw, res.mnw)
