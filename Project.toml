@@ -17,11 +17,12 @@ JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 Logging = "56ddb016-857b-54e1-b83d-db4d58db5568"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 StatsPlots = "f3b207a7-027a-5e70-b257-86293d7955fd"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
-julia = "1.9"
 Distributions = "0.25"
 Gurobi = "1.3"
 HiGHS = "1.9"
 JLD2 = "0.4"
 JuMP = "1.22"
+julia = "1.9"

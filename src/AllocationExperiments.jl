@@ -3,6 +3,7 @@ module AllocationExperiments
 using Allocations
 using BenchmarkPlots
 using BenchmarkTools
+using DataFrames
 using Distributions: DiscreteUniform
 using Graphs
 using Gurobi
@@ -11,13 +12,15 @@ using JLD2
 using JuMP
 using Logging
 using Random: default_rng, Xoshiro
-using StatsPlots: mean
+using StatsPlots
+using Unitful
 
 include("types.jl")
 include("tools.jl")
 include("consts.jl")
 include("alloc_loop.jl")
 include("experiments.jl")
+include("plot.jl")
 
 export
     Experiment,
@@ -54,6 +57,8 @@ export
     save,
     load,
     mergefiles,
+    plot_boxplot,
+    plot_boxplots,
     CONF
 
 end # module AllocationExperiments
