@@ -174,10 +174,12 @@ function experiment_mip(
     timeouts = 0
     constraint = nothing
     solver_name_str = nothing
-    stats = (agents=Int[], items=Int[], ranks=Float64[], ef1=Bool[], efx=Bool[],
-        mms_alphas=Float64[], complete=Bool[], constraints=Int[],
+    stats = (
+        agents=Int[], items=Int[], ranks=Float64[], ef=Bool[], ef1=Bool[],
+        efx=Bool[], mms_alphas=Float64[], complete=Bool[], constraints=Int[],
         ef_alphas=Float64[], ef1_alphas=Float64[], efx_alphas=Float64[],
-        nw=Float64[], not_ef1=Pair{Profile,Constraint}[])
+        nw=Float64[], not_ef1=Pair{Profile,Constraint}[]
+    )
     function collect(res, V, C)
         if count == 0
             count += 1
@@ -207,6 +209,7 @@ function experiment_mip(
                 push!(stats.ranks, mean(rank(M) for M in C.matroids))
             end
 
+            push!(stats.ef, check_ef(V, A))
             is_ef1 = check_ef1(V, A)
             push!(stats.ef1, is_ef1)
             push!(stats.efx, check_efx(V, A))

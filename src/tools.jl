@@ -35,9 +35,19 @@ function fix_missing_times!(data::Experiment, time_limit=TIME_LIMIT)
 end
 
 function fix_missing_times!(data::MultiExperiment, time_limit=TIME_LIMIT)
-    for (_, d) in data.experiments
-        fix_missing_times!(d, time_limit)
-    end
+    foreach(d -> fix_missing_times!(d, time_limit), values(data.experiments))
+    return data
+end
 
+function add_ef_from_alphas!(data::Experiment)
+    if :ef_alphas in keys(data.stats)
+        ef = [x >= 1 for x in data.stats.ef_alphas]
+        data.stats = (; ef=ef, data.stats...)
+    end
+    return data
+end
+
+function add_ef_from_alphas!(data::MultiExperiment)
+    foreach(add_ef_from_alphas!, values(data.experiments))
     return data
 end
