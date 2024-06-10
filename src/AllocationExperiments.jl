@@ -25,6 +25,7 @@ include("plot.jl")
 export
     Experiment,
     MultiExperiment,
+    CONF,
     mnw_matroid_lazy_knu74,
     mnw_matroid_lazy_knu74_asym,
     mnw_matroid_lazy_knu74_ranks,
@@ -57,8 +58,9 @@ export
     save,
     load,
     mergefiles,
-    plot_boxplot,
-    plot_boxplots,
-    CONF
+    filter_inf,
+    times_with_unit,
+    experiment_df,
+    multi_experiment_df
 
 end # module AllocationExperiments

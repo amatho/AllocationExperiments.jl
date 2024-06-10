@@ -1,14 +1,21 @@
 const bench_plot_kwds = (yscale=:log10, ylabel="time", yunit=u"ms", legend=false)
 
-function plot_boxplot(name::AbstractString, values; p=plot(), kwds...)
-    boxplot!(p, [name], filter(!isinf, values); legend=false, kwds...)
-end
-
-function plot_boxplots(itr; p=plot(), kwds...)
-    for (k, v) in itr
-        plot_boxplot(k, v; p=p, kwds...)
+function experiment_df(data::Experiment, name::AbstractString, by)
+    vals = isa(by, Symbol) ? data.stats[by] : by(data)
+    if isa(vals, Array)
+        vals = filter_inf(vals)
     end
-    return p
+    return DataFrame(x=name, y=vals)
 end
 
-bench_times_with_unit(benchmark::BenchmarkTools.Trial) = benchmark.times * u"ns"
+function multi_experiment_df(data::MultiExperiment, by)
+    df = DataFrame(x=String[], y=Float64[])
+    for (k, v) in sort(data.experiments)
+        append!(df, experiment_df(v, k, by))
+    end
+    return df
+end
+
+filter_inf(a) = filter(!isinf, a)
+
+times_with_unit(benchmark::BenchmarkTools.Trial) = benchmark.times * u"ns"
