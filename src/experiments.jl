@@ -85,6 +85,18 @@ mms_matroid_lazy_er59(; kwds...) =
 mms_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_mms, er59_asym; kwds...)
 
+mms_matroid_loop_knu74(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu74_sym; kwds...)
+
+mms_matroid_loop_knu74_asym(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu74_asym; kwds...)
+
+mms_matroid_loop_knu74_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu74_sym; solver=CONF.HIGHS, kwds...)
+
+mms_matroid_loop_knu74_asym_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu74_asym; solver=CONF.HIGHS, kwds...)
+
 mms_unconstrained(; kwds...) =
     experiment_mip(alloc_mms; kwds...)
 
