@@ -20,12 +20,18 @@ function multi_experiment_df(data::MultiExperiment; by=nothing)
     return df
 end
 
-filter_inf(x::Number) = x
-filter_inf(a) = filter(!isinf, a)
-
-times_with_unit(benchmark::BenchmarkTools.Trial) = benchmark.times * u"ns"
-
 function mean_by_x(df::DataFrame)
     df_grouped = groupby(df, :x)
     return combine(df_grouped, Not(:x) .=> mean .=> identity)
 end
+
+function parse_xs!(df::DataFrame)
+    xs = [parse(Int, x[3:end]) for x in df[!, :x]]
+    df[!, :x] = xs
+    return df
+end
+
+filter_inf(x::Number) = x
+filter_inf(a) = filter(!isinf, a)
+
+times_with_unit(benchmark::BenchmarkTools.Trial) = benchmark.times * u"ns"

@@ -64,10 +64,11 @@ export
     save,
     load,
     mergefiles,
-    filter_inf,
-    times_with_unit,
-    mean_by_x,
     experiment_df,
     multi_experiment_df
+    mean_by_x,
+    parse_xs!,
+    filter_inf,
+    times_with_unit
 
 end # module AllocationExperiments
