@@ -2,7 +2,7 @@ const bench_plot_kwds = (yscale=:log10, ylabel="time", yunit=u"ms", legend=false
 
 function experiment_df(data::Experiment, name::AbstractString; by=nothing)
     if isnothing(by)
-        df = DataFrame(filter(x->!isempty(x[2]), pairs(data.stats)))
+        df = DataFrame(filter(((k, v),) -> k != :not_ef1 && !isempty(v), pairs(data.stats)))
         df[!, :x] .= name
         return df
     else

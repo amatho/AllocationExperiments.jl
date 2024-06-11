@@ -230,7 +230,7 @@ function experiment_mip(
             push!(stats.ef1_alphas, ef1_alpha(V, A))
             push!(stats.efx_alphas, efx_alpha(V, A))
 
-            if (alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop)
+            if alloc_func == alloc_mnw || alloc_func == alloc_mnw_loop
                 push!(stats.nw, res.mnw)
 
                 is_ef1 || push!(stats.not_ef1, V => C)
@@ -238,7 +238,7 @@ function experiment_mip(
                 push!(stats.nw, nash_welfare(V, A))
             end
 
-            if alloc_func == alloc_mms
+            if alloc_func == alloc_mms || alloc_func == alloc_mms_loop
                 mmss = res.mmss
 
                 constraints = res.added_constraints + sum(res.mms_added_constraints)
