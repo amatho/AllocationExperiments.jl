@@ -67,7 +67,7 @@ export
     experiment_df,
     multi_experiment_df
     mean_by_x,
-    parse_xs!,
+    parse_rank_xs!,
     filter_inf,
     times_with_unit
 

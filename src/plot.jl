@@ -25,9 +25,9 @@ function mean_by_x(df::DataFrame)
     return combine(df_grouped, Not(:x) .=> mean .=> identity)
 end
 
-function parse_xs!(df::DataFrame)
-    xs = [parse(Int, x[3:end]) for x in df[!, :x]]
-    df[!, :x] = xs
+function parse_rank_xs!(df::DataFrame)
+    rs = [parse(Int, x[3:end]) for x in df[!, :x]]
+    df[!, :r] = rs
     return df
 end
 
