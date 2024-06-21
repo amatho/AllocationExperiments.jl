@@ -65,7 +65,7 @@ export
     load,
     mergefiles,
     experiment_df,
-    multi_experiment_df
+    multi_experiment_df,
     mean_by_x,
     parse_rank_xs!,
     filter_inf,
