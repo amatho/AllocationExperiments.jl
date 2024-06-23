@@ -43,6 +43,9 @@ mnw_matroid_lazy_er59(; kwds...) =
 mnw_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_mnw, er59_asym; kwds...)
 
+mnw_matroid_lazy_knu74_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, knu74_sym; solver=CONF.GLPK, kwds...)
+
 mnw_matroid_loop_knu74(; kwds...) =
     experiment_mip(alloc_mnw_loop, knu74_sym; kwds...)
 
@@ -84,6 +87,9 @@ mms_matroid_lazy_er59(; kwds...) =
 
 mms_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_mms, er59_asym; kwds...)
+
+mms_matroid_lazy_knu74_glpk(; kwds...) =
+    experiment_mip(alloc_mms, knu74_sym; solver=CONF.GLPK, kwds...)
 
 mms_matroid_loop_knu74(; kwds...) =
     experiment_mip(alloc_mms_loop, knu74_sym; kwds...)
@@ -147,8 +153,14 @@ function experiment_mip(
     c_rng = gen_rng()
     r_rng = gen_rng()
 
-    if alloc_func == alloc_mms
-        extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
+    if alloc_func == alloc_mms || alloc_func == alloc_mms_loop
+        if solver == CONF.HIGHS
+            extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.HIGHS_MMS,))
+        elseif solver == CONF.GLPK
+            extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.GLPK_MMS,))
+        else
+            extra_kwds = (cutoff=true, mms_kwds=(solver=CONF.GUROBI_MMS,))
+        end
     elseif alloc_func == alloc_rand_mip
         extra_kwds = (rng=r_rng,)
     else

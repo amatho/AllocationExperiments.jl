@@ -5,6 +5,7 @@ using BenchmarkPlots
 using BenchmarkTools
 using DataFrames
 using Distributions: DiscreteUniform
+using GLPK
 using Graphs
 using Gurobi
 using HiGHS
@@ -33,6 +34,7 @@ export
     mnw_matroid_lazy_knu74_ranks,
     mnw_matroid_lazy_er59,
     mnw_matroid_lazy_er59_asym,
+    mnw_matroid_lazy_knu74_glpk,
     mnw_matroid_loop_knu74,
     mnw_matroid_loop_knu74_asym,
     mnw_matroid_loop_er59,
@@ -47,6 +49,7 @@ export
     mms_matroid_lazy_knu74_asym,
     mms_matroid_lazy_er59,
     mms_matroid_lazy_er59_asym,
+    mms_matroid_lazy_knu74_glpk,
     mms_matroid_loop_knu74,
     mms_matroid_loop_knu74_asym,
     mms_matroid_loop_knu74_highs,

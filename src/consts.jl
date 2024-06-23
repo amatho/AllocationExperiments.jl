@@ -4,9 +4,12 @@ mutable struct Conf
     GUROBI
     GUROBI_MMS
     HIGHS
+    HIGHS_MMS
+    GLPK
+    GLPK_MMS
 end
 
-const CONF = Conf(true, 10, nothing, nothing, nothing)
+const CONF = Conf(true, 10, nothing, nothing, nothing, nothing, nothing, nothing)
 const GRB_ENV_REF = Ref{Gurobi.Env}()
 const TIME_LIMIT = 300
 const SAMPLES = 1000
@@ -33,6 +36,12 @@ function __init__()
         "log_to_console" => false,
         "time_limit" => float(TIME_LIMIT)
     ]
+    glpk_attributes = Pair[
+        "msg_lev" => GLP_MSG_OFF,
+        "tm_lim" => TIME_LIMIT * 1000,
+        "mip_gap" => 0.0001,
+        "presolve" => GLP_ON
+    ]
     threads = parse_env(Int, "SLURM_CPUS_PER_TASK")
     if !isnothing(threads)
         push!(gurobi_attributes, "Threads" => threads)
@@ -56,6 +65,21 @@ function __init__()
     CONF.HIGHS = optimizer_with_attributes(
         HiGHS.Optimizer,
         highs_attributes...
+    )
+    CONF.HIGHS_MMS = optimizer_with_attributes(
+        HiGHS.Optimizer,
+        "mip_rel_gap" => 0.05,
+        highs_attributes...
+    )
+
+    CONF.GLPK = optimizer_with_attributes(
+        GLPK.Optimizer,
+        glpk_attributes...
+    )
+    CONF.GLPK_MMS = optimizer_with_attributes(
+        GLPK.Optimizer,
+        glpk_attributes...,
+        "mip_gap" => 0.05
     )
 
     return
