@@ -46,6 +46,15 @@ mnw_matroid_lazy_er59_asym(; kwds...) =
 mnw_matroid_lazy_knu74_glpk(; kwds...) =
     experiment_mip(alloc_mnw, knu74_sym; solver=CONF.GLPK, kwds...)
 
+mnw_matroid_lazy_knu74_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, knu74_asym; solver=CONF.GLPK, kwds...)
+
+mnw_matroid_lazy_er59_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, er59_sym; solver=CONF.GLPK, kwds...)
+
+mnw_matroid_lazy_er59_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, er59_asym; solver=CONF.GLPK, kwds...)
+
 mnw_matroid_loop_knu74(; kwds...) =
     experiment_mip(alloc_mnw_loop, knu74_sym; kwds...)
 
@@ -90,6 +99,15 @@ mms_matroid_lazy_er59_asym(; kwds...) =
 
 mms_matroid_lazy_knu74_glpk(; kwds...) =
     experiment_mip(alloc_mms, knu74_sym; solver=CONF.GLPK, kwds...)
+
+mms_matroid_lazy_knu74_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mms, knu74_asym; solver=CONF.GLPK, kwds...)
+
+mms_matroid_lazy_er59_glpk(; kwds...) =
+    experiment_mip(alloc_mms, er59_sym; solver=CONF.GLPK, kwds...)
+
+mms_matroid_lazy_er59_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mms, er59_asym; solver=CONF.GLPK, kwds...)
 
 mms_matroid_loop_knu74(; kwds...) =
     experiment_mip(alloc_mms_loop, knu74_sym; kwds...)
