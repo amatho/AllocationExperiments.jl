@@ -24,7 +24,7 @@ mnw_matroid_lazy_knu74_asym(; kwds...) =
 
 function mnw_matroid_lazy_knu74_ranks(; kwds...)
     multi_exp = MultiExperiment()
-    r_values = 3:11
+    r_values = 3:9
 
     for r in r_values
         function gen_matroids(rng, _, m)
@@ -120,6 +120,12 @@ mms_matroid_loop_knu74_highs(; kwds...) =
 
 mms_matroid_loop_knu74_asym_highs(; kwds...) =
     experiment_mip(alloc_mms_loop, knu74_asym; solver=CONF.HIGHS, kwds...)
+
+mms_matroid_loop_er59_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, er59_sym; solver=CONF.HIGHS, kwds...)
+
+mms_matroid_loop_er59_asym_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, er59_asym; solver=CONF.HIGHS, kwds...)
 
 mms_unconstrained(; kwds...) =
     experiment_mip(alloc_mms; kwds...)
