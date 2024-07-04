@@ -12,10 +12,23 @@ function experiment_df(data::Experiment, name::AbstractString; by=nothing)
     end
 end
 
-function multi_experiment_df(data::MultiExperiment; by=nothing)
+function experiment_df(data::MultiExperiment; by=nothing)
     df = DataFrame()
     for (k, v) in sort(data.experiments)
         append!(df, experiment_df(v, k, by=by))
+    end
+    return df
+end
+
+function benchmark_df(data::Experiment, name::AbstractString)
+    vals = data.benchmark.times * u"ns"
+    return DataFrame(x=name, y=vals)
+end
+
+function benchmark_df(data::MultiExperiment)
+    df = DataFrame()
+    for (k, v) in sort(data.experiments)
+        append!(df, benchmark_df(v, k))
     end
     return df
 end
