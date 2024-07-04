@@ -25,7 +25,7 @@ To run an experiment simply load the package and run the desired experiment:
 ```julia
 julia> using AllocationExperiments
 
-julia> data = mnw_matroid_lazy_knu74(samples=10)
+julia> data = mnw_matroid_lazy_knu75(samples=10)
 ```
 
 ## Saving and loading experiment data

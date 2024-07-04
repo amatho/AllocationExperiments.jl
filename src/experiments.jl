@@ -1,9 +1,9 @@
-function knu74_sym(rng, _, m)
-    return MatroidConstraint(rand_matroid_knu74(m, rng=rng, r=2:4))
+function knu75_sym(rng, _, m)
+    return MatroidConstraint(rand_matroid_knu75(m, rng=rng, r=2:4))
 end
 
-function knu74_asym(rng, n, m)
-    return MatroidConstraints(rand_matroid_knu74(n, m, rng=rng, r=2:4))
+function knu75_asym(rng, n, m)
+    return MatroidConstraints(rand_matroid_knu75(n, m, rng=rng, r=2:4))
 end
 
 function er59_sym(rng, _, m)
@@ -16,19 +16,19 @@ function er59_asym(rng, n, m)
     return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, verts=min_verts:m))
 end
 
-mnw_matroid_lazy_knu74(; kwds...) =
-    experiment_mip(alloc_mnw, knu74_sym; kwds...)
+mnw_matroid_lazy_knu75(; kwds...) =
+    experiment_mip(alloc_mnw, knu75_sym; kwds...)
 
-mnw_matroid_lazy_knu74_asym(; kwds...) =
-    experiment_mip(alloc_mnw, knu74_asym; kwds...)
+mnw_matroid_lazy_knu75_asym(; kwds...) =
+    experiment_mip(alloc_mnw, knu75_asym; kwds...)
 
-function mnw_matroid_lazy_knu74_ranks(; kwds...)
+function mnw_matroid_lazy_knu75_ranks(; kwds...)
     multi_exp = MultiExperiment()
     r_values = 3:9
 
     for r in r_values
         function gen_matroids(rng, _, m)
-            return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
+            return MatroidConstraint(rand_matroid_knu75(m, r=r:r, rng=rng))
         end
 
         multi_exp.experiments["r=$r"] = experiment_mip(alloc_mnw, gen_matroids; n=3:3, m=n->6n:6n, kwds...)
@@ -43,11 +43,11 @@ mnw_matroid_lazy_er59(; kwds...) =
 mnw_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_mnw, er59_asym; kwds...)
 
-mnw_matroid_lazy_knu74_glpk(; kwds...) =
-    experiment_mip(alloc_mnw, knu74_sym; solver=CONF.GLPK, kwds...)
+mnw_matroid_lazy_knu75_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, knu75_sym; solver=CONF.GLPK, kwds...)
 
-mnw_matroid_lazy_knu74_asym_glpk(; kwds...) =
-    experiment_mip(alloc_mnw, knu74_asym; solver=CONF.GLPK, kwds...)
+mnw_matroid_lazy_knu75_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mnw, knu75_asym; solver=CONF.GLPK, kwds...)
 
 mnw_matroid_lazy_er59_glpk(; kwds...) =
     experiment_mip(alloc_mnw, er59_sym; solver=CONF.GLPK, kwds...)
@@ -55,11 +55,11 @@ mnw_matroid_lazy_er59_glpk(; kwds...) =
 mnw_matroid_lazy_er59_asym_glpk(; kwds...) =
     experiment_mip(alloc_mnw, er59_asym; solver=CONF.GLPK, kwds...)
 
-mnw_matroid_loop_knu74(; kwds...) =
-    experiment_mip(alloc_mnw_loop, knu74_sym; kwds...)
+mnw_matroid_loop_knu75(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu75_sym; kwds...)
 
-mnw_matroid_loop_knu74_asym(; kwds...) =
-    experiment_mip(alloc_mnw_loop, knu74_asym; kwds...)
+mnw_matroid_loop_knu75_asym(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu75_asym; kwds...)
 
 mnw_matroid_loop_er59(; kwds...) =
     experiment_mip(alloc_mnw_loop, er59_sym; kwds...)
@@ -67,11 +67,11 @@ mnw_matroid_loop_er59(; kwds...) =
 mnw_matroid_loop_er59_asym(; kwds...) =
     experiment_mip(alloc_mnw_loop, er59_asym; kwds...)
 
-mnw_matroid_loop_knu74_highs(; kwds...) =
-    experiment_mip(alloc_mnw_loop, knu74_sym; solver=CONF.HIGHS, kwds...)
+mnw_matroid_loop_knu75_highs(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu75_sym; solver=CONF.HIGHS, kwds...)
 
-mnw_matroid_loop_knu74_asym_highs(; kwds...) =
-    experiment_mip(alloc_mnw_loop, knu74_asym; solver=CONF.HIGHS, kwds...)
+mnw_matroid_loop_knu75_asym_highs(; kwds...) =
+    experiment_mip(alloc_mnw_loop, knu75_asym; solver=CONF.HIGHS, kwds...)
 
 mnw_matroid_loop_er59_highs(; kwds...) =
     experiment_mip(alloc_mnw_loop, er59_sym; solver=CONF.HIGHS, kwds...)
@@ -85,11 +85,11 @@ mnw_unconstrained(; kwds...) =
 mnw_unconstrained_ranks_comparison(; kwds...) =
     experiment_mip(alloc_mnw; n=3:3, m=n->6n:6n, kwds...)
 
-mms_matroid_lazy_knu74(; kwds...) =
-    experiment_mip(alloc_mms, knu74_sym; kwds...)
+mms_matroid_lazy_knu75(; kwds...) =
+    experiment_mip(alloc_mms, knu75_sym; kwds...)
 
-mms_matroid_lazy_knu74_asym(; kwds...) =
-    experiment_mip(alloc_mms, knu74_asym; kwds...)
+mms_matroid_lazy_knu75_asym(; kwds...) =
+    experiment_mip(alloc_mms, knu75_asym; kwds...)
 
 mms_matroid_lazy_er59(; kwds...) =
     experiment_mip(alloc_mms, er59_sym; kwds...)
@@ -97,11 +97,11 @@ mms_matroid_lazy_er59(; kwds...) =
 mms_matroid_lazy_er59_asym(; kwds...) =
     experiment_mip(alloc_mms, er59_asym; kwds...)
 
-mms_matroid_lazy_knu74_glpk(; kwds...) =
-    experiment_mip(alloc_mms, knu74_sym; solver=CONF.GLPK, kwds...)
+mms_matroid_lazy_knu75_glpk(; kwds...) =
+    experiment_mip(alloc_mms, knu75_sym; solver=CONF.GLPK, kwds...)
 
-mms_matroid_lazy_knu74_asym_glpk(; kwds...) =
-    experiment_mip(alloc_mms, knu74_asym; solver=CONF.GLPK, kwds...)
+mms_matroid_lazy_knu75_asym_glpk(; kwds...) =
+    experiment_mip(alloc_mms, knu75_asym; solver=CONF.GLPK, kwds...)
 
 mms_matroid_lazy_er59_glpk(; kwds...) =
     experiment_mip(alloc_mms, er59_sym; solver=CONF.GLPK, kwds...)
@@ -109,17 +109,17 @@ mms_matroid_lazy_er59_glpk(; kwds...) =
 mms_matroid_lazy_er59_asym_glpk(; kwds...) =
     experiment_mip(alloc_mms, er59_asym; solver=CONF.GLPK, kwds...)
 
-mms_matroid_loop_knu74(; kwds...) =
-    experiment_mip(alloc_mms_loop, knu74_sym; kwds...)
+mms_matroid_loop_knu75(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu75_sym; kwds...)
 
-mms_matroid_loop_knu74_asym(; kwds...) =
-    experiment_mip(alloc_mms_loop, knu74_asym; kwds...)
+mms_matroid_loop_knu75_asym(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu75_asym; kwds...)
 
-mms_matroid_loop_knu74_highs(; kwds...) =
-    experiment_mip(alloc_mms_loop, knu74_sym; solver=CONF.HIGHS, kwds...)
+mms_matroid_loop_knu75_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu75_sym; solver=CONF.HIGHS, kwds...)
 
-mms_matroid_loop_knu74_asym_highs(; kwds...) =
-    experiment_mip(alloc_mms_loop, knu74_asym; solver=CONF.HIGHS, kwds...)
+mms_matroid_loop_knu75_asym_highs(; kwds...) =
+    experiment_mip(alloc_mms_loop, knu75_asym; solver=CONF.HIGHS, kwds...)
 
 mms_matroid_loop_er59_highs(; kwds...) =
     experiment_mip(alloc_mms_loop, er59_sym; solver=CONF.HIGHS, kwds...)
@@ -130,19 +130,19 @@ mms_matroid_loop_er59_asym_highs(; kwds...) =
 mms_unconstrained(; kwds...) =
     experiment_mip(alloc_mms; kwds...)
 
-rnd_matroid_lazy_knu74(; kwds...) =
-    experiment_mip(alloc_rand_mip, knu74_sym; kwds...)
+rnd_matroid_lazy_knu75(; kwds...) =
+    experiment_mip(alloc_rand_mip, knu75_sym; kwds...)
 
-rnd_matroid_lazy_knu74_asym(; kwds...) =
-    experiment_mip(alloc_rand_mip, knu74_asym; kwds...)
+rnd_matroid_lazy_knu75_asym(; kwds...) =
+    experiment_mip(alloc_rand_mip, knu75_asym; kwds...)
 
-function rnd_matroid_lazy_knu74_ranks(; kwds...)
+function rnd_matroid_lazy_knu75_ranks(; kwds...)
     multi_exp = MultiExperiment()
     r_values = 3:9
 
     for r in r_values
         function gen_matroids(rng, _, m)
-            return MatroidConstraint(rand_matroid_knu74(m, r=r:r, rng=rng))
+            return MatroidConstraint(rand_matroid_knu75(m, r=r:r, rng=rng))
         end
 
         multi_exp.experiments["r=$r"] = experiment_mip(alloc_rand_mip, gen_matroids; n=3:3, m=n->6n:6n, kwds...)
