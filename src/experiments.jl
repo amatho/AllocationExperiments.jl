@@ -3,7 +3,7 @@ function knu75_sym(rng, _, m)
 end
 
 function knu75_asym(rng, n, m)
-    return MatroidConstraints(rand_matroid_knu75(n, m, rng=rng, r=2:4))
+    return MatroidConstraints(rand_matroid_knu75_asym(n, m, rng=rng, r=2:4))
 end
 
 function er59_sym(rng, _, m)
@@ -13,7 +13,7 @@ end
 
 function er59_asym(rng, n, m)
     min_verts = ceil(Int, sqrt(2 * m) + (1 / 2))
-    return MatroidConstraints(rand_matroid_er59(n, m, rng=rng, verts=min_verts:m))
+    return MatroidConstraints(rand_matroid_er59_asym(n, m, rng=rng, verts=min_verts:m))
 end
 
 mnw_matroid_lazy_knu75(; kwds...) =
