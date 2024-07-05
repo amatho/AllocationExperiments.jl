@@ -20,15 +20,19 @@ function experiment_df(data::MultiExperiment; by=nothing)
     return df
 end
 
-function benchmark_df(data::Experiment, name::AbstractString)
+function benchmark_df(data::Experiment, name::AbstractString; add_timeouts=true)
     vals = data.benchmark.times * u"ns"
+    if add_timeouts
+        remaining = data.samples - length(vals)
+        append!(vals, fill(1e9 * TIME_LIMIT, remaining))
+    end
     return DataFrame(x=name, y=vals)
 end
 
-function benchmark_df(data::MultiExperiment)
+function benchmark_df(data::MultiExperiment; add_timeouts=true)
     df = DataFrame()
     for (k, v) in sort(data.experiments)
-        append!(df, benchmark_df(v, k))
+        append!(df, benchmark_df(v, k, add_timeouts=add_timeouts))
     end
     return df
 end
