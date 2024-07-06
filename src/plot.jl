@@ -24,7 +24,7 @@ function benchmark_df(data::Experiment, name::AbstractString; add_timeouts=true)
     vals = data.benchmark.times * u"ns"
     if add_timeouts
         remaining = data.samples - length(vals)
-        append!(vals, fill(1e9 * TIME_LIMIT, remaining))
+        append!(vals, fill(1e9 * TIME_LIMIT * u"ns", remaining))
     end
     return DataFrame(x=name, y=vals)
 end
