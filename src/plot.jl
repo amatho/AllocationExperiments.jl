@@ -39,7 +39,7 @@ end
 
 function mean_by_x(df::DataFrame)
     df_grouped = groupby(df, :x)
-    return combine(df_grouped, Not(:x) .=> mean .=> identity)
+    return combine(df_grouped, Not(:x) .=> mean ∘ filter_inf .=> identity)
 end
 
 function parse_rank_xs!(df::DataFrame)
