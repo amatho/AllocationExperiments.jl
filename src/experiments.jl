@@ -121,6 +121,12 @@ mms_matroid_loop_knu75_highs(; kwds...) =
 mms_matroid_loop_knu75_asym_highs(; kwds...) =
     experiment_mip(alloc_mms_loop, knu75_asym; solver=CONF.HIGHS, kwds...)
 
+mms_matroid_loop_er59(; kwds...) =
+    experiment_mip(alloc_mms_loop, er59_sym; kwds...)
+
+mms_matroid_loop_er59_asym(; kwds...) =
+    experiment_mip(alloc_mms_loop, er59_asym; kwds...)
+
 mms_matroid_loop_er59_highs(; kwds...) =
     experiment_mip(alloc_mms_loop, er59_sym; solver=CONF.HIGHS, kwds...)
 

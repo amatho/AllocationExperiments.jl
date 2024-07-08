@@ -60,6 +60,8 @@ export
     mms_matroid_loop_knu75_asym,
     mms_matroid_loop_knu75_highs,
     mms_matroid_loop_knu75_asym_highs,
+    mms_matroid_loop_er59,
+    mms_matroid_loop_er59_asym,
     mms_matroid_loop_er59_highs,
     mms_matroid_loop_er59_asym_highs,
     mms_unconstrained,
